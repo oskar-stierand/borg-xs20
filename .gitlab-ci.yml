@@ -1,0 +1,18 @@
+# .gitlab-ci.yml
+# Automaticky nasadí BORG XS-20 na GitLab Pages při každém push na main.
+# Syntetizátor bude dostupný na: https://USERNAME.gitlab.io/borg-xs20
+
+stages:
+  - deploy
+
+pages:
+  stage: deploy
+  script:
+    - mkdir -p public
+    - cp index.html public/index.html
+    - cp -r versions public/versions 2>/dev/null || true
+  artifacts:
+    paths:
+      - public
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"

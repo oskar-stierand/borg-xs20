@@ -1,0 +1,144 @@
+# CLAUDE.md — Instrukce pro Claude Code
+
+Tento soubor popisuje jak pracovat s projektem BORG XS-20. Přečti ho vždy před jakoukoliv změnou kódu.
+
+---
+
+## Projekt
+
+**BORG XS-20** je single-file webový syntezátor v `index.html`. Žádný build, žádné závislosti, žádný Node.js — vše je v jednom souboru.
+
+Tasky jsou vedeny v **Linear, workspace Kostohryz, projekt BORG XS20**.  
+Před každou prací načti otevřené issues: stav `Todo` v projektu BORG XS20.
+
+---
+
+## Zásady práce s kódem
+
+### ✅ Vždy
+- **Chirurgické změny** — měň jen to co je v tasku. Jeden task = jedna izolovaná změna.
+- **Syntax check** po každé změně: `node -e "new Function(js)"` na JS blok
+- **Záloha před změnou** — zkopíruj aktuální `index.html` do `versions/index-vX.html`
+- **Linear update** — po dokončení tasku změň stav na `Done`
+
+### ❌ Nikdy
+- Nespouštěj více vizuálních přepisů najednou (viz zahozenou v5 — poučení z praxe)
+- Neměň audio engine a UI zároveň
+- Nepřepisuj celé funkce pokud stačí opravit 2–3 řádky
+
+---
+
+## Struktura souboru `index.html`
+
+```
+<style>          ← veškerý CSS
+<body>           ← HTML struktura syntetizátoru
+<script>
+  // CONSTANTS & STATE (S.params objekt)
+  // AUDIO ENGINE
+  //   buildDriftBuffer()
+  //   initAudio()
+  //   buildVoice()
+  //   noteOn() / noteOff()
+  //   liveUpdate()
+  // WHEELS (createWheelCanvas)
+  // WOOD PANELS (drawWoodPanel / initWoodPanels)
+  // KNOBS (initKnobs)
+  // KEYBOARD (buildKeyboard)
+  // MIDI (initMIDI)
+  // PRESETS (applyState / captureState)
+  // BOOT (DOMContentLoaded)
+```
+
+---
+
+## Klíčové funkce — kde co najít
+
+| Funkce | Co dělá |
+|--------|---------|
+| `initAudio()` | Inicializace Web Audio contextu a efektů |
+| `buildVoice(freq, vel)` | Vytvoří 1 hlas (VCO→VCF→VCA) |
+| `noteOn(midi, vel)` | Spustí hlas, voice stealing |
+| `noteOff(midi)` | Zastaví hlas, release fáze |
+| `liveUpdate(param, val)` | Real-time update parametru na hrajících hlasech |
+| `createWheelCanvas(housing, isPitch)` | Canvas renderer pro Pitch/Mod kolo |
+| `drawWoodPanel(canvas, side)` | Canvas renderer pro dřevěné boky |
+| `initKnobs()` | Drag handling pro rotační knoby |
+| `buildKeyboard()` | Vykreslí klaviaturu od `S.octave` |
+| `applyState(preset)` | Načte preset do UI + audio parametrů |
+| `initMIDI()` | Web MIDI API, hot-plug, Note/Bend/CC handling |
+
+---
+
+## State objekt `S`
+
+```javascript
+S = {
+  octave: 3,          // aktuální oktáva (0–7)
+  pitchBend: 0,       // ±1.0
+  voices: {},         // aktivní hlasy { midiNote: voiceObj }
+  voiceList: [],      // FIFO pro voice stealing
+  params: {
+    // VCO
+    osc1Wave, osc2Wave, osc1Tune, osc2Tune, osc1Level, osc2Level,
+    // VCF
+    filterCutoff, filterRes, eg1Amount, hpfCutoff,
+    // EG1 (filtr)
+    eg1Attack, eg1Decay, eg1Sustain, eg1Release,
+    // EG2 (amplituda)
+    eg2Attack, eg2Decay, eg2Sustain, eg2Release,
+    // LFO
+    lfoRate, lfoAmount, lfoTarget,
+    // Effects
+    reverbMix, delayTime, delayFeedback, delayMix, chorusMix,
+    // Master
+    masterVol, glide,
+  }
+}
+```
+
+---
+
+## Otevřené tasky (načti z Linear před prací)
+
+```
+KOS-13 — Pitch/Mod kola: realistický vizuál (guma, ridges, 3D, Retina 2×)
+KOS-14 — Dřevěné boky: fotorealistický canvas (katedrální letokruhy, medullary flecks, varnišový lesk)
+KOS-15 — ADSR: nahradit knoby vertikálními fadery (slot + ivory cap, drag up=zvýšit, dblclick=reset)
+```
+
+---
+
+## Git workflow
+
+```bash
+# Před každým taskem
+git checkout -b kos-XX-kratky-popis
+
+# Po dokončení
+git add index.html
+git commit -m "KOS-XX: stručný popis co bylo změněno"
+git push origin kos-XX-kratky-popis
+# → otevřít Merge Request na GitLabu
+```
+
+Branch naming: `kos-{číslo}-{slug}` (stejný formát jako Linear `gitBranchName`).
+
+---
+
+## Testování
+
+Žádné automatické testy. Manuální checklist po každé změně:
+
+- [ ] JS syntax check projde bez chyb
+- [ ] Syntetizátor se načte v Chrome bez console errors
+- [ ] MIDI klávesy fungují (Note On/Off, vizuální highlight)
+- [ ] Presety se správně načítají (applyState)
+- [ ] Změna oktávy překreslí klaviaturu
+- [ ] Zvuk hraje bez artefaktů
+
+---
+
+## Komunikace
+
+Projekt je vyvíjen česky. Commit messages jsou anglicky (konvence).

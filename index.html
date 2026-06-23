@@ -1,0 +1,2416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BORG XS-20 Synthesizer</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&family=VT323&display=swap" rel="stylesheet">
+<style>
+:root {
+  /* MS-20 authentic palette */
+  --ms-body:     #2b2b2b;       /* dark charcoal chassis */
+  --ms-panel:    #1e1e1e;       /* slightly darker panel areas */
+  --ms-cream:    #e8ddc8;       /* cream/ivory labels */
+  --ms-cream2:   #c8bea8;       /* dimmer label colour */
+  --ms-orange:   #e06010;       /* classic Korg orange */
+  --ms-orange2:  #f07820;       /* brighter orange accent */
+  --ms-yellow:   #d8a820;       /* yellow accent */
+  --ms-red:      #c01808;
+  --ms-green:    #208030;
+  --ms-green2:   #30b040;
+  --ms-silver:   #888880;       /* metal hardware */
+  --ms-silver2:  #aaa898;
+  --ms-screwbg:  #404040;
+
+  --knob-body:   #303030;
+  --knob-ring:   #585850;
+  --knob-dot:    #f07820;
+  --knob-shadow: rgba(0,0,0,0.9);
+
+  --key-white:   #f0ece0;
+  --key-black:   #1a1a14;
+  --key-pressed-w: #e0a830;
+  --key-pressed-b: #b06010;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { font-size: 14px; }
+
+body {
+  background: #111;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24px 8px 48px;
+  font-family: 'Share Tech Mono', monospace;
+  color: var(--ms-cream);
+  overflow-x: hidden;
+}
+
+/* ── CHASSIS ─────────────────────────────────── */
+.chassis {
+  width: 100%;
+  max-width: 1360px;
+  background: var(--ms-body);
+  border-radius: 0;
+  border: 2px solid #404040;
+  border-left: none;
+  border-right: none;
+  box-shadow:
+    0 6px 0 #0a0a0a,
+    0 10px 40px rgba(0,0,0,0.95),
+    inset 0 1px 0 rgba(255,255,255,0.06);
+  overflow: hidden;
+  flex: 1;
+  min-width: 0;
+}
+
+/* ── SYNTH FRAME (chassis + wood sides) ──────── */
+.synth-frame {
+  width: 100%;
+  max-width: 1440px;
+  display: flex;
+  align-items: stretch;
+  box-shadow:
+    0 0 0 1px #222,
+    0 8px 0 #080808,
+    0 14px 60px rgba(0,0,0,0.98);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+/* ── WOOD PANELS ─────────────────────────────── */
+.wood-panel {
+  flex-shrink: 0;
+  width: 36px;
+  /* height stretches to match chassis via align-items:stretch */
+  display: block;
+  cursor: default;
+}
+.wood-left  { border-radius: 10px 0 0 10px; }
+.wood-right { border-radius: 0 10px 10px 0; }
+
+/* ── TOP NAMEPLATE ────────────────────────────── */
+.nameplate {
+  background: #1a1a1a;
+  border-bottom: 2px solid #555;
+  padding: 8px 18px 6px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.nameplate-brand {
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 900;
+  font-size: clamp(13px, 2.2vw, 20px);
+  letter-spacing: 6px;
+  color: var(--ms-cream);
+  text-shadow: 0 0 16px rgba(232,96,16,0.4);
+}
+
+.nameplate-model {
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 700;
+  font-size: clamp(9px, 1.4vw, 13px);
+  letter-spacing: 4px;
+  color: var(--ms-orange);
+}
+
+.nameplate-sub {
+  font-size: 9px;
+  letter-spacing: 3px;
+  color: var(--ms-cream2);
+}
+
+.nameplate-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.status-bar {
+  background: #0e0e0a;
+  border: 1px solid #2a2a20;
+  border-radius: 3px;
+  padding: 3px 10px;
+  font-family: 'VT323', monospace;
+  font-size: 13px;
+  color: var(--ms-green2);
+  text-shadow: 0 0 8px var(--ms-green);
+  letter-spacing: 2px;
+  min-width: 160px;
+  text-align: center;
+}
+
+/* MIDI LED */
+.midi-indicator {
+  display: flex; align-items: center; gap: 5px;
+  font-size: 8px; color: #555; letter-spacing: 1px;
+}
+.midi-led {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: #1a2a10; border: 1px solid #2a4018;
+  transition: all .08s;
+  box-shadow: none;
+}
+.midi-led.on { background: var(--ms-green2); box-shadow: 0 0 8px var(--ms-green); }
+
+/* ── MAIN PANEL GRID ──────────────────────────── */
+.main-panel {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1.1fr 1fr 1fr;
+  gap: 2px;
+  background: #111;
+  padding: 2px;
+}
+
+@media (max-width: 900px) {
+  .main-panel { grid-template-columns: 1fr 1fr 1fr; }
+}
+@media (max-width: 580px) {
+  .main-panel { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 360px) {
+  .main-panel { grid-template-columns: 1fr; }
+}
+
+/* individual section block */
+.section {
+  background: var(--ms-body);
+  padding: 10px 8px 8px;
+  position: relative;
+}
+
+/* coloured top stripe — MS-20 uses thick printed borders */
+.section::before {
+  content: '';
+  display: block;
+  height: 3px;
+  border-radius: 1px;
+  margin-bottom: 7px;
+}
+.section.stripe-orange::before { background: var(--ms-orange); }
+.section.stripe-yellow::before { background: var(--ms-yellow); }
+.section.stripe-cream::before  { background: var(--ms-cream2); }
+.section.stripe-red::before    { background: var(--ms-red); }
+.section.stripe-green::before  { background: var(--ms-green2); }
+
+.sec-title {
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 700;
+  font-size: 8px;
+  letter-spacing: 3px;
+  color: var(--ms-cream2);
+  text-align: center;
+  margin-bottom: 8px;
+  white-space: nowrap;
+}
+
+/* ── KNOB ─────────────────────────────────────── */
+.knob-group {
+  display: flex; flex-direction: column;
+  align-items: center; gap: 3px;
+}
+.knob-svg {
+  cursor: ns-resize;
+  user-select: none;
+  touch-action: none;
+  display: block;
+  filter: drop-shadow(0 3px 6px rgba(0,0,0,0.9));
+  transition: filter .1s;
+}
+.knob-svg:hover {
+  filter: drop-shadow(0 3px 8px rgba(240,120,32,.5));
+}
+.knob-label {
+  font-size: 7.5px;
+  color: var(--ms-cream2);
+  text-align: center;
+  letter-spacing: .5px;
+  max-width: 52px;
+  white-space: nowrap;
+}
+
+.knob-row {
+  display: flex; justify-content: space-around;
+  align-items: flex-end; flex-wrap: wrap; gap: 6px;
+}
+
+/* ── WAVE SELECTOR ────────────────────────────── */
+.wave-row {
+  display: flex; gap: 3px; justify-content: center;
+  margin-bottom: 7px;
+}
+.wave-btn {
+  width: 26px; height: 22px;
+  border: 1px solid #404038;
+  border-radius: 3px;
+  background: #181810;
+  cursor: pointer; display: flex;
+  align-items: center; justify-content: center;
+  padding: 0; transition: all .12s;
+}
+.wave-btn:hover { border-color: var(--ms-orange); }
+.wave-btn.active {
+  background: rgba(224,96,16,.18);
+  border-color: var(--ms-orange);
+  box-shadow: 0 0 6px rgba(240,120,32,.4);
+}
+.wave-btn svg { pointer-events: none; }
+
+/* ── SWITCH / TOGGLE ──────────────────────────── */
+.sw-row { display: flex; gap: 2px; background: #111; border-radius: 3px; padding: 2px; border: 1px solid #333; }
+.sw-btn {
+  padding: 3px 7px;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 8px; letter-spacing: 1px;
+  border: none; border-radius: 2px;
+  cursor: pointer; background: transparent; color: #555;
+  transition: all .12s;
+}
+.sw-btn.active { background: var(--ms-orange); color: #000; box-shadow: 0 0 6px rgba(240,120,32,.5); }
+
+/* ── ADSR sub-label ───────────────────────────── */
+.sub-label {
+  font-size: 7px; color: #666; text-align: center;
+  letter-spacing: 1px; margin-bottom: 4px;
+}
+
+/* ── PRESET BANK ──────────────────────────────── */
+.preset-strip {
+  background: #1a1a1a;
+  border-top: 2px solid #111;
+  border-bottom: 2px solid #111;
+  padding: 6px 12px;
+  display: flex; align-items: center;
+  gap: 8px; flex-wrap: wrap;
+}
+.preset-label {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 7px; letter-spacing: 3px;
+  color: #555;
+}
+.preset-btn {
+  width: 26px; height: 26px;
+  background: #222; border: 1px solid #444;
+  border-radius: 3px; color: var(--ms-cream2);
+  font-family: 'VT323', monospace; font-size: 15px;
+  cursor: pointer; transition: all .12s;
+  display: flex; align-items: center; justify-content: center;
+}
+.preset-btn:hover { border-color: var(--ms-orange); color: var(--ms-orange); }
+.preset-btn.active { background: rgba(224,96,16,.22); border-color: var(--ms-orange); color: var(--ms-orange); box-shadow: 0 0 6px rgba(240,120,32,.3); }
+.preset-btn.has-data { color: var(--ms-yellow); border-color: rgba(216,168,32,.4); }
+.preset-btn.factory  { color: #7090b0; border-color: rgba(80,120,160,.3); }
+.preset-btn.factory:hover { color: #90b8e0; border-color: #5090c0; }
+.preset-sep { width: 1px; height: 20px; background: #333; margin: 0 2px; }
+
+.tool-btn {
+  padding: 3px 8px;
+  background: #222; border: 1px solid #444;
+  border-radius: 3px; color: var(--ms-cream2);
+  font-family: 'Share Tech Mono', monospace; font-size: 8px;
+  letter-spacing: 1px; cursor: pointer; transition: all .12s;
+}
+.tool-btn:hover { border-color: var(--ms-orange); color: var(--ms-orange); }
+
+/* ── KEYBOARD SECTION ─────────────────────────── */
+.keyboard-section {
+  background: #222;
+  border-top: 2px solid #111;
+  padding: 10px 10px 14px;
+}
+
+.keyboard-topbar {
+  display: flex; align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px; flex-wrap: wrap; gap: 8px;
+}
+
+.keyboard-wrap {
+  /* position context for black keys */
+  position: relative;
+  display: flex;
+  align-items: flex-start;   /* ← TOP-ALIGNED */
+  height: 130px;
+  user-select: none;
+}
+
+/* ─── WHITE KEY ─── */
+.key-w {
+  position: relative;
+  flex-shrink: 0;
+  width: clamp(22px, 3.2vw, 36px);
+  height: 100%;
+  background: linear-gradient(180deg, #e8e4d8 0%, #f5f1e8 55%, #ddd8c8 100%);
+  border-left:   1px solid #b0a890;
+  border-right:  1px solid #b0a890;
+  border-bottom: 1px solid #908870;
+  border-radius: 0 0 5px 5px;
+  cursor: pointer;
+  z-index: 1;
+  transition: background .04s;
+  box-shadow:
+    inset 0 -4px 8px rgba(0,0,0,.12),
+    1px 0 0 rgba(255,255,255,.35),
+    0 4px 8px rgba(0,0,0,.5);
+}
+.key-w:hover {
+  background: linear-gradient(180deg, #f0ece0 0%, #fdfaf0 55%, #e8e4d4 100%);
+}
+.key-w.on {
+  background: linear-gradient(180deg, #e8a828 0%, #f0c040 55%, #c88818 100%) !important;
+  box-shadow: inset 0 3px 6px rgba(0,0,0,.2), 0 2px 4px rgba(0,0,0,.5);
+  transform: translateY(2px);
+}
+.key-w .note-lbl {
+  position: absolute; bottom: 5px;
+  left: 0; right: 0; text-align: center;
+  font-size: 7px; color: #888070;
+  pointer-events: none; user-select: none;
+}
+
+/* ─── BLACK KEY ─── */
+.key-b {
+  position: absolute;
+  top: 0;                    /* ← TOP ALIGNED */
+  z-index: 2;
+  /* width and height set via JS to stay proportional */
+  height: 60%;
+  background: linear-gradient(180deg, #282820 0%, #1a1a14 55%, #0e0e0a 100%);
+  border: 1px solid #3a3830;
+  border-radius: 0 0 4px 4px;
+  cursor: pointer;
+  box-shadow:
+    inset -2px 0 3px rgba(0,0,0,.6),
+    2px 5px 10px rgba(0,0,0,.8);
+  transition: background .04s;
+}
+.key-b::after {
+  content: '';
+  position: absolute; top: 4px; left: 3px; right: 3px;
+  height: 30%; background: linear-gradient(180deg, rgba(255,255,255,.09), transparent);
+  border-radius: 2px; pointer-events: none;
+}
+.key-b:hover {
+  background: linear-gradient(180deg, #353528 0%, #252518 55%, #181810 100%);
+}
+.key-b.on {
+  background: linear-gradient(180deg, #c06018 0%, #904808 55%, #703005 100%) !important;
+  box-shadow: inset -1px 0 2px rgba(0,0,0,.6), 1px 2px 5px rgba(0,0,0,.8);
+  transform: translateY(2px);
+}
+
+/* ── MS-20 REALISTIC ROTARY WHEELS ─────────────── */
+/*
+   Rendered via Canvas — a cylindrical rubber wheel viewed
+   from a slight angle, with perspective-foreshortened grooves.
+   Housing is a recessed slot with cast shadow & metal lip.
+*/
+.wheels {
+  display: flex;
+  gap: 14px;
+  align-items: flex-end;
+  margin-right: 14px;
+  flex-shrink: 0;
+}
+.wheel-col {
+  display: flex; flex-direction: column;
+  align-items: center; gap: 5px;
+}
+.wheel-lbl {
+  font-size: 7px; color: #777; letter-spacing: 2px;
+  text-transform: uppercase;
+  font-family: 'Share Tech Mono', monospace;
+}
+
+/* Outer housing — metal surround */
+.wheel-housing {
+  position: relative;
+  width: 52px;
+  /* height set by canvas inside */
+  background: #1a1a16;
+  border-radius: 5px;
+  border: 2px solid #555;
+  box-shadow:
+    0 0 0 1px #222,
+    0 4px 12px rgba(0,0,0,.9),
+    inset 0 1px 0 rgba(255,255,255,.06),
+    inset 0 -1px 0 rgba(0,0,0,.5);
+  cursor: ns-resize;
+  touch-action: none;
+  user-select: none;
+  padding: 4px 3px;
+}
+
+/* Pitch = warm orange tint on the lip */
+.wheel-housing.pitch { border-color: #6a5030; }
+/* Mod = cool blue tint */
+.wheel-housing.mod   { border-color: #303858; }
+
+/* The canvas fills the housing interior */
+.wheel-housing canvas {
+  display: block;
+  border-radius: 3px;
+  pointer-events: none;
+}
+
+/* Centre reference notch — engraved line on housing */
+.wheel-housing::after {
+  content: '';
+  position: absolute;
+  left: -2px; right: -2px;
+  top: 50%; transform: translateY(-50%);
+  height: 3px;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    rgba(255,255,255,.04) 20%,
+    rgba(255,255,255,.12) 50%,
+    rgba(255,255,255,.04) 80%,
+    transparent 100%);
+  pointer-events: none;
+  z-index: 5;
+}
+
+/* Octave control */
+.oct-btn {
+  padding: 3px 9px; background: #222; border: 1px solid #444;
+  border-radius: 3px; color: var(--ms-cream2);
+  font-family: 'Share Tech Mono', monospace; font-size: 9px;
+  cursor: pointer; transition: all .12s;
+}
+.oct-btn:hover { border-color: var(--ms-orange); color: var(--ms-orange); }
+.oct-display {
+  font-family: 'VT323', monospace; font-size: 16px;
+  color: var(--ms-orange); min-width: 38px; text-align: center;
+}
+
+/* ── MODALS / MENUS ───────────────────────────── */
+.toast {
+  position: fixed; bottom: 18px; left: 50%;
+  transform: translateX(-50%) translateY(50px);
+  background: rgba(26,18,8,.95); border: 1px solid var(--ms-orange);
+  color: var(--ms-cream); padding: 6px 16px;
+  border-radius: 5px; font-size: 11px; letter-spacing: 2px;
+  z-index: 9000; transition: transform .25s ease;
+  box-shadow: 0 4px 20px rgba(0,0,0,.8);
+}
+.toast.show { transform: translateX(-50%) translateY(0); }
+
+.ctx-menu {
+  display: none; position: fixed;
+  background: #1c1c14; border: 1px solid var(--ms-orange);
+  border-radius: 5px; padding: 4px; z-index: 8000;
+  box-shadow: 0 4px 20px rgba(0,0,0,.9);
+}
+.ctx-menu.show { display: block; }
+.ctx-item {
+  padding: 5px 12px; font-size: 9px; letter-spacing: 1px;
+  color: var(--ms-cream2); cursor: pointer; border-radius: 3px;
+  transition: all .1s;
+}
+.ctx-item:hover { background: rgba(224,96,16,.2); color: var(--ms-orange); }
+
+.modal-bg {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,.85); z-index: 7000;
+  align-items: center; justify-content: center;
+}
+.modal-bg.show { display: flex; }
+.modal {
+  background: #1c1c14; border: 1px solid var(--ms-orange);
+  border-radius: 7px; padding: 18px;
+  max-width: 480px; width: 90%;
+  box-shadow: 0 8px 40px rgba(0,0,0,.9);
+}
+.modal-title { font-family: 'Orbitron', sans-serif; font-size: 11px; color: var(--ms-orange); letter-spacing: 3px; margin-bottom: 10px; }
+.modal-url {
+  width: 100%; background: #0e0e0a; border: 1px solid #303028;
+  color: var(--ms-cream); padding: 7px; border-radius: 3px;
+  font-family: 'Share Tech Mono', monospace; font-size: 9px;
+  margin-bottom: 10px; word-break: break-all;
+  resize: none;
+}
+.modal-btns { display: flex; gap: 7px; justify-content: flex-end; }
+.modal-btn {
+  padding: 5px 14px; background: transparent; border: 1px solid var(--ms-orange);
+  color: var(--ms-orange); font-family: 'Share Tech Mono', monospace; font-size: 9px;
+  letter-spacing: 2px; border-radius: 3px; cursor: pointer; transition: all .12s;
+}
+.modal-btn:hover { background: rgba(224,96,16,.18); }
+.modal-btn.primary { background: var(--ms-orange); color: #000; }
+.modal-btn.primary:hover { background: var(--ms-orange2); }
+
+/* ── SVG DEFS HACK ────────────────────────────── */
+#svgDefs { position: absolute; width: 0; height: 0; overflow: hidden; }
+</style>
+</head>
+<body>
+
+<!-- Shared SVG gradients -->
+<svg id="svgDefs" aria-hidden="true">
+  <defs>
+    <radialGradient id="kbody" cx="38%" cy="32%" r="62%">
+      <stop offset="0%"   stop-color="#484038"/>
+      <stop offset="100%" stop-color="#1c1810"/>
+    </radialGradient>
+    <radialGradient id="kinner" cx="38%" cy="32%" r="62%">
+      <stop offset="0%"   stop-color="#383028"/>
+      <stop offset="100%" stop-color="#141008"/>
+    </radialGradient>
+  </defs>
+</svg>
+
+<div class="synth-frame">
+  <canvas class="wood-panel wood-left"  id="woodLeft"></canvas>
+  <div class="chassis">
+
+  <!-- ── NAMEPLATE ── -->
+  <div class="nameplate">
+    <div style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;">
+      <span class="nameplate-brand">BORG</span>
+      <span class="nameplate-model">XS-20</span>
+      <span class="nameplate-sub">SEMI-MODULAR SYNTHESIZER</span>
+    </div>
+    <div class="nameplate-right">
+      <div class="midi-indicator">
+        <div class="midi-led" id="midiLed"></div>
+        <span id="midiTxt">NO MIDI</span>
+      </div>
+      <div class="status-bar" id="statusBar">READY</div>
+      <div style="font-size:8px;color:#555;letter-spacing:1px;" id="voiceTxt">0 VOICES</div>
+    </div>
+  </div>
+
+  <!-- ── MAIN PANEL ── -->
+  <div class="main-panel">
+
+    <!-- VCO 1 -->
+    <div class="section stripe-orange">
+      <div class="sec-title">VCO · 1</div>
+      <div class="wave-row" id="wv1"></div>
+      <div class="knob-row">
+        <div class="knob-group">
+          <svg class="knob-svg" data-id="v1fr" data-param="vco1Freq"  data-min="-24" data-max="24"  data-def="0"   data-val="0"   width="44" height="44" viewBox="0 0 44 44"><circle cx="22" cy="22" r="19" fill="url(#kbody)" stroke="#585850" stroke-width="1.5"/><circle cx="22" cy="22" r="15" fill="url(#kinner)" stroke="#383028" stroke-width="1"/><circle cx="22" cy="22" r="7" fill="#181410" stroke="#282018" stroke-width="1"/><line id="v1fr-ind" x1="22" y1="22" x2="22" y2="7" stroke="#f07820" stroke-width="2.5" stroke-linecap="round"/></svg>
+          <div class="knob-label">FREQ</div>
+        </div>
+        <div class="knob-group">
+          <svg class="knob-svg" data-id="v1fi" data-param="vco1Fine"  data-min="-100" data-max="100" data-def="0" data-val="0" width="34" height="34" viewBox="0 0 34 34"><circle cx="17" cy="17" r="14" fill="url(#kbody)" stroke="#585850" stroke-width="1.5"/><circle cx="17" cy="17" r="11" fill="url(#kinner)" stroke="#383028" stroke-width="1"/><circle cx="17" cy="17" r="5" fill="#181410"/><line id="v1fi-ind" x1="17" y1="17" x2="17" y2="5" stroke="#f07820" stroke-width="2" stroke-linecap="round"/></svg>
+          <div class="knob-label">FINE</div>
+        </div>
+        <div class="knob-group">
+          <svg class="knob-svg" data-id="v1pw" data-param="vco1PW"    data-min="0" data-max="1" data-def="0.5" data-val="0.5" width="34" height="34" viewBox="0 0 34 34"><circle cx="17" cy="17" r="14" fill="url(#kbody)" stroke="#585850" stroke-width="1.5"/><circle cx="17" cy="17" r="11" fill="url(#kinner)" stroke="#383028" stroke-width="1"/><circle cx="17" cy="17" r="5" fill="#181410"/><line id="v1pw-ind" x1="17" y1="17" x2="17" y2="5" stroke="#f07820" stroke-width="2" stroke-linecap="round"/></svg>
+          <div class="knob-label">P.WIDTH</div>
+        </div>
+        <div class="knob-group">
+          <svg class="knob-svg" data-id="v1lv" data-param="vco1Level" data-min="0" data-max="1" data-def="0.8" data-val="0.8" width="34" height="34" viewBox="0 0 34 34"><circle cx="17" cy="17" r="14" fill="url(#kbody)" stroke="#585850" stroke-width="1.5"/><circle cx="17" cy="17" r="11" fill="url(#kinner)" stroke="#383028" stroke-width="1"/><circle cx="17" cy="17" r="5" fill="#181410"/><line id="v1lv-ind" x1="17" y1="17" x2="17" y2="5" stroke="#f07820" stroke-width="2" stroke-linecap="round"/></svg>
+          <div class="knob-label">LEVEL</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VCO 2 -->
+    <div class="section stripe-orange">
+      <div class="sec-title">VCO · 2</div>
+      <div class="wave-row" id="wv2"></div>
+      <div class="knob-row">
+        <div class="knob-group">
+          <svg class="knob-svg" data-id="v2fr" data-param="vco2Freq"  data-min="-24" data-max="24" data-def="0" data-val="0" width="44" height="44" viewBox="0 0 44 44"><circle cx="22" cy="22" r="19" fill="url(#kbody)" stroke="#585850" stroke-width="1.5"/><circle cx="22" cy="22" r="15" fill="url(#kinner)" stroke="#383028" stroke-width="1"/><circle cx="22" cy="22" r="7" fill="#181410"/><line id="v2fr-ind" x1="22" y1="22" x2="22" y2="7" stroke="#f07820" stroke-width="2.5" stroke-linecap="round"/></svg>
+          <div class="knob-label">FREQ</div>
+        </div>
+        <div class="knob-group">
+          <svg class="knob-svg" data-id="v2fi" data-param="vco2Fine"  data-min="-100" data-max="100" data-def="0" data-val="0" width="34" height="34" viewBox="0 0 34 34"><circle cx="17" cy="17" r="14" fill="url(#kbody)" stroke="#585850" stroke-width="1.5"/><circle cx="17" cy="17" r="11" fill="url(#kinner)" stroke="#383028" stroke-width="1"/><circle cx="17" cy="17" r="5" fill="#181410"/><line id="v2fi-ind" x1="17" y1="17" x2="17" y2="5" stroke="#f07820" stroke-width="2" stroke-linecap="round"/></svg>
+          <div class="knob-label">FINE</div>
+        </div>
+        <div class="knob-group">
+          <svg class="knob-svg" data-id="v2pw" data-param="vco2PW"    data-min="0" data-max="1" data-def="0.5" data-val="0.5" width="34" height="34" viewBox="0 0 34 34"><circle cx="17" cy="17" r="14" fill="url(#kbody)" stroke="#585850" stroke-width="1.5"/><circle cx="17" cy="17" r="11" fill="url(#kinner)" stroke="#383028" stroke-width="1"/><circle cx="17" cy="17" r="5" fill="#181410"/><line id="v2pw-ind" x1="17" y1="17" x2="17" y2="5" stroke="#f07820" stroke-width="2" stroke-linecap="round"/></svg>
+          <div class="knob-label">P.WIDTH</div>
+        </div>
+        <div class="knob-group">
+          <svg class="knob-svg" data-id="v2lv" data-param="vco2Level" data-min="0" data-max="1" data-def="0.5" data-val="0.5" width="34" height="34" viewBox="0 0 34 34"><circle cx="17" cy="17" r="14" fill="url(#kbody)" stroke="#585850" stroke-width="1.5"/><circle cx="17" cy="17" r="11" fill="url(#kinner)" stroke="#383028" stroke-width="1"/><circle cx="17" cy="17" r="5" fill="#181410"/><line id="v2lv-ind" x1="17" y1="17" x2="17" y2="5" stroke="#f07820" stroke-width="2" stroke-linecap="round"/></svg>
+          <div class="knob-label">LEVEL</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VCF -->
+    <div class="section stripe-yellow">
+      <div class="sec-title">VCF · HPF &amp; LPF</div>
+      <div class="knob-row">
+        <div class="knob-group">
+          <svg class="knob-svg" data-id="hpf" data-param="hpfCutoff" data-min="20" data-max="8000" data-def="20" data-val="20" data-scale="log" width="50" height="50" viewBox="0 0 50 50"><circle cx="25" cy="25" r="22" fill="url(#kbody)" stroke="#585850" stroke-width="1.5"/><circle cx="25" cy="25" r="18" fill="url(#kinner)" stroke="#383028" stroke-width="1"/><circle cx="25" cy="25" r="9" fill="#181410"/><line id="hpf-ind" x1="25" y1="25" x2="25" y2="7" stroke="#d8a820" stroke-width="3" stroke-linecap="round"/></svg>
+          <div class="knob-label">HPF CUTOFF</div>
+        </div>
+        <div class="knob-group">
+          <svg class="knob-svg" data-id="lpf" data-param="lpfCutoff" data-min="200" data-max="18000" data-def="8000" data-val="8000" data-scale="log" width="50" height="50" viewBox="0 0 50 50"><circle cx="25" cy="25" r="22" fill="url(#kbody)" stroke="#585850" stroke-width="1.5"/><circle cx="25" cy="25" r="18" fill="url(#kinner)" stroke="#383028" stroke-width="1"/><circle cx="25" cy="25" r="9" fill="#181410"/><line id="lpf-ind" x1="25" y1="25" x2="25" y2="7" stroke="#d8a820" stroke-width="3" stroke-linecap="round"/></svg>
+          <div class="knob-label">LPF CUTOFF</div>
+        </div>
+        <div class="knob-group">
+          <svg class="knob-svg" data-id="res" data-param="resonance"  data-min="0" data-max="25" data-def="0" data-val="0" width="44" height="44" viewBox="0 0 44 44"><circle cx="22" cy="22" r="19" fill="url(#kbody)" stroke="#585850" stroke-width="1.5"/><circle cx="22" cy="22" r="15" fill="url(#kinner)" stroke="#383028" stroke-width="1"/><circle cx="22" cy="22" r="7" fill="#181410"/><line id="res-ind" x1="22" y1="22" x2="22" y2="7" stroke="#d8a820" stroke-width="2.5" stroke-linecap="round"/></svg>
+          <div class="knob-label">RESONANCE</div>
+        </div>
+        <div class="knob-group">
+          <svg class="knob-svg" data-id="fea" data-param="filterEnvAmt" data-min="-1" data-max="1" data-def="0.3" data-val="0.3" width="44" height="44" viewBox="0 0 44 44"><circle cx="22" cy="22" r="19" fill="url(#kbody)" stroke="#585850" stroke-width="1.5"/><circle cx="22" cy="22" r="15" fill="url(#kinner)" stroke="#383028" stroke-width="1"/><circle cx="22" cy="22" r="7" fill="#181410"/><line id="fea-ind" x1="22" y1="22" x2="22" y2="7" stroke="#d8a820" stroke-width="2.5" stroke-linecap="round"/></svg>
+          <div class="knob-label">ENV AMT</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- EG -->
+    <div class="section stripe-cream">
+      <div class="sec-title">EG · 1 &amp; 2</div>
+      <div style="display:flex;gap:4px;">
+        <div style="flex:1;">
+          <div class="sub-label">EG1 FILTER</div>
+          <div class="knob-row">
+            <div class="knob-group"><svg class="knob-svg" data-id="e1a" data-param="eg1Attack"  data-min="0.001" data-max="3" data-def="0.01" data-val="0.01" data-scale="log" width="32" height="32" viewBox="0 0 32 32"><circle cx="16" cy="16" r="13" fill="url(#kbody)" stroke="#585850" stroke-width="1.5"/><circle cx="16" cy="16" r="10" fill="url(#kinner)"/><circle cx="16" cy="16" r="5" fill="#181410"/><line id="e1a-ind" x1="16" y1="16" x2="16" y2="5" stroke="#f07820" stroke-width="2" stroke-linecap="round"/></svg><div class="knob-label">A</div></div>
+            <div class="knob-group"><svg class="knob-svg" data-id="e1d" data-param="eg1Decay"   data-min="0.01" data-max="3" data-def="0.3" data-val="0.3" data-scale="log" width="32" height="32" viewBox="0 0 32 32"><circle cx="16" cy="16" r="13" fill="url(#kbody)" stroke="#585850" stroke-width="1.5"/><circle cx="16" cy="16" r="10" fill="url(#kinner)"/><circle cx="16" cy="16" r="5" fill="#181410"/><line id="e1d-ind" x1="16" y1="16" x2="16" y2="5" stroke="#f07820" stroke-width="2" stroke-linecap="round"/></svg><div class="knob-label">D</div></div>
+            <div class="knob-group"><svg class="knob-svg" data-id="e1s" data-param="eg1Sustain" data-min="0" data-max="1" data-def="0.5" data-val="0.5" width="32" height="32" viewBox="0 0 32 32"><circle cx="16" cy="16" r="13" fill="url(#kbody)" stroke="#585850" stroke-width="1.5"/><circle cx="16" cy="16" r="10" fill="url(#kinner)"/><circle cx="16" cy="16" r="5" fill="#181410"/><line id="e1s-ind" x1="16" y1="16" x2="16" y2="5" stroke="#f07820" stroke-width="2" stroke-linecap="round"/></svg><div class="knob-label">S</div></div>
+            <div class="knob-group"><svg class="knob-svg" data-id="e1r" data-param="eg1Release" data-min="0.01" data-max="5" data-def="0.5" data-val="0.5" data-scale="log" width="32" height="32" viewBox="0 0 32 32"><circle cx="16" cy="16" r="13" fill="url(#kbody)" stroke="#585850" stroke-width="1.5"/><circle cx="16" cy="16" r="10" fill="url(#kinner)"/><circle cx="16" cy="16" r="5" fill="#181410"/><line id="e1r-ind" x1="16" y1="16" x2="16" y2="5" stroke="#f07820" stroke-width="2" stroke-linecap="round"/></svg><div class="knob-label">R</div></div>
+          </div>
+        </div>
+        <div style="width:1px;background:#303028;"></div>
+        <div style="flex:1;">
+          <div class="sub-label">EG2 AMP</div>
+          <div class="knob-row">
+            <div class="knob-group"><svg class="knob-svg" data-id="e2a" data-param="eg2Attack"  data-min="0.001" data-max="3" data-def="0.005" data-val="0.005" data-scale="log" width="32" height="32" viewBox="0 0 32 32"><circle cx="16" cy="16" r="13" fill="url(#kbody)" stroke="#585850" stroke-width="1.5"/><circle cx="16" cy="16" r="10" fill="url(#kinner)"/><circle cx="16" cy="16" r="5" fill="#181410"/><line id="e2a-ind" x1="16" y1="16" x2="16" y2="5" stroke="#d8a820" stroke-width="2" stroke-linecap="round"/></svg><div class="knob-label">A</div></div>
+            <div class="knob-group"><svg class="knob-svg" data-id="e2d" data-param="eg2Decay"   data-min="0.01" data-max="3" data-def="0.2" data-val="0.2" data-scale="log" width="32" height="32" viewBox="0 0 32 32"><circle cx="16" cy="16" r="13" fill="url(#kbody)" stroke="#585850" stroke-width="1.5"/><circle cx="16" cy="16" r="10" fill="url(#kinner)"/><circle cx="16" cy="16" r="5" fill="#181410"/><line id="e2d-ind" x1="16" y1="16" x2="16" y2="5" stroke="#d8a820" stroke-width="2" stroke-linecap="round"/></svg><div class="knob-label">D</div></div>
+            <div class="knob-group"><svg class="knob-svg" data-id="e2s" data-param="eg2Sustain" data-min="0" data-max="1" data-def="0.7" data-val="0.7" width="32" height="32" viewBox="0 0 32 32"><circle cx="16" cy="16" r="13" fill="url(#kbody)" stroke="#585850" stroke-width="1.5"/><circle cx="16" cy="16" r="10" fill="url(#kinner)"/><circle cx="16" cy="16" r="5" fill="#181410"/><line id="e2s-ind" x1="16" y1="16" x2="16" y2="5" stroke="#d8a820" stroke-width="2" stroke-linecap="round"/></svg><div class="knob-label">S</div></div>
+            <div class="knob-group"><svg class="knob-svg" data-id="e2r" data-param="eg2Release" data-min="0.01" data-max="5" data-def="0.3" data-val="0.3" data-scale="log" width="32" height="32" viewBox="0 0 32 32"><circle cx="16" cy="16" r="13" fill="url(#kbody)" stroke="#585850" stroke-width="1.5"/><circle cx="16" cy="16" r="10" fill="url(#kinner)"/><circle cx="16" cy="16" r="5" fill="#181410"/><line id="e2r-ind" x1="16" y1="16" x2="16" y2="5" stroke="#d8a820" stroke-width="2" stroke-linecap="round"/></svg><div class="knob-label">R</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- LFO + FX -->
+    <div class="section stripe-green">
+      <div class="sec-title">MG · LFO &amp; FX</div>
+      <div class="wave-row" id="wvL"></div>
+      <div class="knob-row" style="margin-bottom:6px;">
+        <div class="knob-group">
+          <svg class="knob-svg" data-id="lfr" data-param="lfoRate"   data-min="0.1" data-max="20" data-def="2" data-val="2" data-scale="log" width="38" height="38" viewBox="0 0 38 38"><circle cx="19" cy="19" r="16" fill="url(#kbody)" stroke="#585850" stroke-width="1.5"/><circle cx="19" cy="19" r="13" fill="url(#kinner)"/><circle cx="19" cy="19" r="6" fill="#181410"/><line id="lfr-ind" x1="19" y1="19" x2="19" y2="5" stroke="#30b040" stroke-width="2.5" stroke-linecap="round"/></svg>
+          <div class="knob-label">RATE</div>
+        </div>
+        <div class="knob-group">
+          <svg class="knob-svg" data-id="lfp" data-param="lfoPitch"  data-min="0" data-max="1" data-def="0" data-val="0" width="32" height="32" viewBox="0 0 32 32"><circle cx="16" cy="16" r="13" fill="url(#kbody)" stroke="#585850" stroke-width="1.5"/><circle cx="16" cy="16" r="10" fill="url(#kinner)"/><circle cx="16" cy="16" r="5" fill="#181410"/><line id="lfp-ind" x1="16" y1="16" x2="16" y2="5" stroke="#30b040" stroke-width="2" stroke-linecap="round"/></svg>
+          <div class="knob-label">→PITCH</div>
+        </div>
+        <div class="knob-group">
+          <svg class="knob-svg" data-id="lff" data-param="lfoFilter" data-min="0" data-max="1" data-def="0" data-val="0" width="32" height="32" viewBox="0 0 32 32"><circle cx="16" cy="16" r="13" fill="url(#kbody)" stroke="#585850" stroke-width="1.5"/><circle cx="16" cy="16" r="10" fill="url(#kinner)"/><circle cx="16" cy="16" r="5" fill="#181410"/><line id="lff-ind" x1="16" y1="16" x2="16" y2="5" stroke="#30b040" stroke-width="2" stroke-linecap="round"/></svg>
+          <div class="knob-label">→FILTER</div>
+        </div>
+      </div>
+      <div style="width:100%;height:1px;background:#303028;margin:4px 0 6px;"></div>
+      <div class="knob-row">
+        <div class="knob-group">
+          <svg class="knob-svg" data-id="rev" data-param="reverbMix"  data-min="0" data-max="1" data-def="0.1" data-val="0.1" width="32" height="32" viewBox="0 0 32 32"><circle cx="16" cy="16" r="13" fill="url(#kbody)" stroke="#585850" stroke-width="1.5"/><circle cx="16" cy="16" r="10" fill="url(#kinner)"/><circle cx="16" cy="16" r="5" fill="#181410"/><line id="rev-ind" x1="16" y1="16" x2="16" y2="5" stroke="#d8a820" stroke-width="2" stroke-linecap="round"/></svg>
+          <div class="knob-label">REVERB</div>
+        </div>
+        <div class="knob-group">
+          <svg class="knob-svg" data-id="dly" data-param="delayMix"   data-min="0" data-max="1" data-def="0" data-val="0" width="32" height="32" viewBox="0 0 32 32"><circle cx="16" cy="16" r="13" fill="url(#kbody)" stroke="#585850" stroke-width="1.5"/><circle cx="16" cy="16" r="10" fill="url(#kinner)"/><circle cx="16" cy="16" r="5" fill="#181410"/><line id="dly-ind" x1="16" y1="16" x2="16" y2="5" stroke="#d8a820" stroke-width="2" stroke-linecap="round"/></svg>
+          <div class="knob-label">DELAY</div>
+        </div>
+        <div class="knob-group">
+          <svg class="knob-svg" data-id="cho" data-param="chorusMix"  data-min="0" data-max="1" data-def="0" data-val="0" width="32" height="32" viewBox="0 0 32 32"><circle cx="16" cy="16" r="13" fill="url(#kbody)" stroke="#585850" stroke-width="1.5"/><circle cx="16" cy="16" r="10" fill="url(#kinner)"/><circle cx="16" cy="16" r="5" fill="#181410"/><line id="cho-ind" x1="16" y1="16" x2="16" y2="5" stroke="#d8a820" stroke-width="2" stroke-linecap="round"/></svg>
+          <div class="knob-label">CHORUS</div>
+        </div>
+        <div class="knob-group">
+          <svg class="knob-svg" data-id="mst" data-param="masterVol"  data-min="0" data-max="1" data-def="0.75" data-val="0.75" width="38" height="38" viewBox="0 0 38 38"><circle cx="19" cy="19" r="16" fill="url(#kbody)" stroke="#f07820" stroke-width="1.5"/><circle cx="19" cy="19" r="13" fill="url(#kinner)"/><circle cx="19" cy="19" r="6" fill="#181410"/><line id="mst-ind" x1="19" y1="19" x2="19" y2="5" stroke="#f07820" stroke-width="2.5" stroke-linecap="round"/></svg>
+          <div class="knob-label">MASTER</div>
+        </div>
+      </div>
+    </div>
+  </div><!-- /main-panel -->
+
+  <!-- ── PRESET STRIP ── -->
+  <div class="preset-strip">
+    <span class="preset-label">PRESETS</span>
+    <div id="presetBank" style="display:flex;gap:3px;"></div>
+    <div class="preset-sep"></div>
+    <button class="tool-btn" id="btnSave">SAVE</button>
+    <button class="tool-btn" id="btnExport">EXPORT</button>
+    <button class="tool-btn" id="btnImport">IMPORT</button>
+    <button class="tool-btn" id="btnShare">SHARE URL</button>
+    <input type="file" id="fileIn" accept=".json" style="display:none">
+    <div class="preset-sep"></div>
+    <!-- Voice mode badge -->
+    <div style="display:flex;flex-direction:column;align-items:center;gap:2px;">
+      <div style="font-size:7px;color:#888;letter-spacing:1px;white-space:nowrap;">VOICE MODE</div>
+      <div style="font-size:7px;color:#c87030;letter-spacing:1.5px;padding:3px 7px;border:1px solid #604030;border-radius:3px;background:#1a1208;white-space:nowrap;">8× ANALOG</div>
+    </div>
+    <!-- Glide -->
+    <div style="display:flex;flex-direction:column;align-items:center;gap:2px;">
+      <div style="font-size:7px;color:#555;letter-spacing:1px;">GLIDE</div>
+      <svg class="knob-svg" data-id="gli" data-param="glide" data-min="0" data-max="0.5" data-def="0" data-val="0" width="26" height="26" viewBox="0 0 26 26"><circle cx="13" cy="13" r="11" fill="url(#kbody)" stroke="#585850" stroke-width="1.5"/><circle cx="13" cy="13" r="8" fill="url(#kinner)"/><circle cx="13" cy="13" r="4" fill="#181410"/><line id="gli-ind" x1="13" y1="13" x2="13" y2="4" stroke="#f07820" stroke-width="1.8" stroke-linecap="round"/></svg>
+    </div>
+  </div>
+
+  <!-- ── KEYBOARD ── -->
+  <div class="keyboard-section">
+
+    <!-- top bar: oct controls only -->
+    <div class="keyboard-topbar">
+      <div style="font-size:8px;color:#404038;letter-spacing:1px;">KEYS: A–K = C–C &nbsp; Z/X = OCT ▼▲</div>
+      <div style="display:flex;align-items:center;gap:7px;">
+        <button class="oct-btn" id="btnOctDn">▼ OCT</button>
+        <div class="oct-display" id="octDisp">C3</div>
+        <button class="oct-btn" id="btnOctUp">OCT ▲</button>
+      </div>
+    </div>
+
+    <!-- wheels LEFT + keys RIGHT -->
+    <div style="display:flex;align-items:flex-end;gap:10px;">
+
+      <!-- ── ROTARY WHEELS (MS-20 realistic canvas) ── -->
+      <div class="wheels">
+        <div class="wheel-col">
+          <div class="wheel-housing pitch" id="pitchHousing"></div>
+          <div class="wheel-lbl">PITCH</div>
+        </div>
+        <div class="wheel-col">
+          <div class="wheel-housing mod" id="modHousing"></div>
+          <div class="wheel-lbl">MOD</div>
+        </div>
+      </div>
+
+      <!-- ── KEYS ── -->
+      <div class="keyboard-wrap" id="keysWrap" style="flex:1;"></div>
+
+    </div>
+  </div>
+
+</div><!-- /chassis -->
+  <canvas class="wood-panel wood-right" id="woodRight"></canvas>
+</div><!-- /synth-frame -->
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<!-- Context menu for presets -->
+<div class="ctx-menu" id="ctxMenu">
+  <div class="ctx-item" id="ctxSave">SAVE TO SLOT</div>
+  <div class="ctx-item" id="ctxLoad">LOAD SLOT</div>
+  <div class="ctx-item" id="ctxClear">CLEAR SLOT</div>
+</div>
+
+<!-- Share modal -->
+<div class="modal-bg" id="shareModal">
+  <div class="modal">
+    <div class="modal-title">SHARE PATCH URL</div>
+    <textarea class="modal-url" id="shareUrl" rows="3" readonly></textarea>
+    <div class="modal-btns">
+      <button class="modal-btn" id="btnCloseModal">CLOSE</button>
+      <button class="modal-btn primary" id="btnCopyUrl">COPY</button>
+    </div>
+  </div>
+</div>
+
+<script>
+'use strict';
+// ═══════════════════════════════════════════════
+//  WAVE SHAPE HELPERS
+// ═══════════════════════════════════════════════
+const SAW_SVG  = `<svg width="22" height="14" viewBox="0 0 22 14"><polyline points="0,12 11,2 11,12 22,2" stroke="currentColor" stroke-width="1.5" fill="none"/></svg>`;
+const SQR_SVG  = `<svg width="22" height="14" viewBox="0 0 22 14"><polyline points="0,12 0,3 11,3 11,12 11,3 22,3 22,12" stroke="currentColor" stroke-width="1.5" fill="none"/></svg>`;
+const TRI_SVG  = `<svg width="22" height="14" viewBox="0 0 22 14"><polyline points="0,12 5.5,2 16.5,12 22,2" stroke="currentColor" stroke-width="1.5" fill="none"/></svg>`;
+const SIN_SVG  = `<svg width="22" height="14" viewBox="0 0 22 14"><path d="M0,7 C2,7 3,2 5.5,2 C8,2 9,12 11,12 C13,12 14,2 16.5,2 C19,2 20,7 22,7" stroke="currentColor" stroke-width="1.5" fill="none"/></svg>`;
+const NSE_SVG  = `<svg width="22" height="14" viewBox="0 0 22 14"><polyline points="0,7 2,3 4,10 6,4 8,9 10,5 12,11 14,3 16,8 18,5 20,7 22,9" stroke="currentColor" stroke-width="1.5" fill="none"/></svg>`;
+
+const WAVE_SETS = {
+  wv1: [['sawtooth',SAW_SVG],['square',SQR_SVG],['triangle',TRI_SVG],['sine',SIN_SVG]],
+  wv2: [['sawtooth',SAW_SVG],['square',SQR_SVG],['triangle',TRI_SVG],['noise',NSE_SVG]],
+  wvL: [['sine',SIN_SVG],['triangle',TRI_SVG],['square',SQR_SVG],['sawtooth',SAW_SVG]],
+};
+
+function buildWaveSelectors() {
+  for (const [id, waves] of Object.entries(WAVE_SETS)) {
+    const el = document.getElementById(id);
+    waves.forEach(([type, svg], i) => {
+      const btn = document.createElement('button');
+      btn.className = 'wave-btn' + (i === 0 ? ' active' : '');
+      btn.dataset.wave = type;
+      btn.style.color = i === 0 ? 'var(--ms-orange)' : 'var(--ms-cream2)';
+      btn.innerHTML = svg;
+      btn.title = type;
+      el.appendChild(btn);
+    });
+    el.addEventListener('click', e => {
+      const btn = e.target.closest('.wave-btn');
+      if (!btn) return;
+      el.querySelectorAll('.wave-btn').forEach(b => {
+        b.classList.remove('active');
+        b.style.color = 'var(--ms-cream2)';
+      });
+      btn.classList.add('active');
+      btn.style.color = 'var(--ms-orange)';
+      if (id === 'wv1') { S.vco1Wave = btn.dataset.wave; for (const v of S.voices.values()) try { v.osc1.type = S.vco1Wave } catch(e){} }
+      if (id === 'wv2') { S.vco2Wave = btn.dataset.wave; }
+      if (id === 'wvL') { S.lfoWave  = btn.dataset.wave; if (S.lfoNode) S.lfoNode.type = S.lfoWave; }
+    });
+  }
+  // set vco2 square default
+  const wv2btns = document.querySelectorAll('#wv2 .wave-btn');
+  wv2btns.forEach(b => { b.classList.remove('active'); b.style.color='var(--ms-cream2)'; });
+  wv2btns[1].classList.add('active'); wv2btns[1].style.color = 'var(--ms-orange)';
+}
+
+// ═══════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════
+const DEFS = {
+  vco1Freq:0, vco1Fine:0, vco1PW:0.5, vco1Level:0.8,
+  vco2Freq:0, vco2Fine:0, vco2PW:0.5, vco2Level:0.5,
+  hpfCutoff:20, lpfCutoff:8000, resonance:0, filterEnvAmt:0.3,
+  eg1Attack:0.01, eg1Decay:0.3, eg1Sustain:0.5, eg1Release:0.5,
+  eg2Attack:0.005, eg2Decay:0.2, eg2Sustain:0.7, eg2Release:0.3,
+  lfoRate:2, lfoPitch:0, lfoFilter:0,
+  reverbMix:0.1, delayMix:0, chorusMix:0,
+  masterVol:0.75, glide:0,
+};
+
+const S = {
+  params: {...DEFS},
+  octave: 3,
+  vco1Wave:'sawtooth', vco2Wave:'square', lfoWave:'sine',
+  voices: new Map(),
+  voiceList: [],
+  maxVoices: 8,
+  pitchBend: 0,
+  presets: Array(8).fill(null),
+  activePreset: null,
+  ctxSlot: null,
+  // audio nodes
+  ctx: null,
+  lfoNode:null, lfoGain:null, lfoFiltGain:null,
+  convolver:null, reverbGain:null, dryGain:null,
+  delayNode:null, delayFb:null, delayMix:null,
+  chorusDelay:null, chorusMix:null,
+  masterGain:null, compressor:null,
+};
+
+
+// ═══════════════════════════════════════════════
+//  ANALOG ENGINE v4 — MS-20 CHARACTER
+//  • Steiner-Parker-like filter simulation
+//    (3x biquad cascade + resonance saturation)
+//  • Per-voice VCO thermal drift (band-limited
+//    noise → very slow random walk on pitch)
+//  • Sub-audio "breath" noise on each oscillator
+//  • Hard-knee pre-filter saturation (tanh clip)
+//  • Post-filter soft-clip (asymmetric waveshaper)
+//  • Exponential ADSR curves (not linear)
+//  • 8-voice polyphony — voices steal oldest
+//  • Glide preserved for legato playing
+// ═══════════════════════════════════════════════
+
+// ──────────────────────────────────────────────
+//  WAVESHAPER CURVES
+// ──────────────────────────────────────────────
+
+// Hard pre-filter clip — aggressive, MS-20 input stage character
+// Uses tanh-based asymmetric curve: positive half clips harder
+function makePreFilterCurve() {
+  const N = 1024, c = new Float32Array(N);
+  for (let i = 0; i < N; i++) {
+    const x = (i / (N - 1)) * 2 - 1;
+    // Asymmetric: negative side softer (diode asymmetry)
+    if (x >= 0) {
+      c[i] = Math.tanh(x * 4.5) * 0.88;
+    } else {
+      c[i] = Math.tanh(x * 2.8) * 0.96;
+    }
+  }
+  return c;
+}
+
+// Post-filter soft-clip — VCA + output stage coloring
+// Adds even harmonics (2nd, 4th) for warmth
+function makePostFilterCurve(drive) {
+  const N = 512, c = new Float32Array(N);
+  const k = 1.0 + drive * 3.5;
+  for (let i = 0; i < N; i++) {
+    const x = (i / (N - 1)) * 2 - 1;
+    // Chebyshev-inspired: emphasises 2nd harmonic
+    const y = (3 * k * x - k * k * k * x * x * x / 3) / (1 + Math.abs(k * x));
+    c[i] = Math.max(-1, Math.min(1, y * 0.72));
+  }
+  return c;
+}
+
+// Resonance self-oscillation saturation
+// Prevents filter blowing up at high Q, adds character
+function makeResonanceCurve() {
+  const N = 256, c = new Float32Array(N);
+  for (let i = 0; i < N; i++) {
+    const x = (i / (N - 1)) * 2 - 1;
+    c[i] = (Math.PI + 15) * x / (Math.PI + 15 * Math.abs(x));
+  }
+  return c;
+}
+
+// ──────────────────────────────────────────────
+//  DRIFT NOISE BUFFER
+//  Band-limited random walk: 1/f-ish noise for
+//  thermal VCO drift. Generated once, looped.
+// ──────────────────────────────────────────────
+function buildDriftBuffer(ctx) {
+  // 8 seconds of drift at SR, looped per voice
+  const sr  = ctx.sampleRate;
+  const len = sr * 8;
+  const buf = ctx.createBuffer(1, len, sr);
+  const d   = buf.getChannelData(0);
+
+  // Pink-ish noise: sum of several lowpass-filtered white noise passes
+  // Result: slow wander between ±3 cents, with occasional ±8 cent excursions
+  let b0=0, b1=0, b2=0, b3=0, b4=0;
+  for (let i = 0; i < len; i++) {
+    const wh = Math.random() * 2 - 1;
+    b0 = 0.99886 * b0 + wh * 0.0555179;
+    b1 = 0.99332 * b1 + wh * 0.0750759;
+    b2 = 0.96900 * b2 + wh * 0.1538520;
+    b3 = 0.86650 * b3 + wh * 0.3104856;
+    b4 = 0.55000 * b4 + wh * 0.5329522;
+    // Sum and scale to cents range (very subtle)
+    d[i] = (b0 + b1 + b2 + b3 + b4) * 0.55;
+  }
+
+  // Normalize to ±1, then scale to ±6 cents max
+  let peak = 0;
+  for (let i = 0; i < len; i++) peak = Math.max(peak, Math.abs(d[i]));
+  const scale = 6 / peak;
+  for (let i = 0; i < len; i++) d[i] *= scale;
+
+  return buf;
+}
+
+// ──────────────────────────────────────────────
+//  AUDIO CONTEXT INIT
+// ──────────────────────────────────────────────
+function initAudio() {
+  if (S.ctx) return;
+  const Ctx = window.AudioContext || window.webkitAudioContext;
+  S.ctx = new Ctx();
+  const ctx = S.ctx;
+
+  // ── Brick-wall limiter (safety net, not a compressor) ──
+  S.limiter = ctx.createDynamicsCompressor();
+  S.limiter.threshold.value = -2;
+  S.limiter.knee.value      = 0;
+  S.limiter.ratio.value     = 20;
+  S.limiter.attack.value    = 0.001;
+  S.limiter.release.value   = 0.05;
+
+  S.masterGain = ctx.createGain();
+  S.masterGain.gain.value = S.params.masterVol;
+
+  // ── Global LFO ──
+  S.lfoNode = ctx.createOscillator();
+  S.lfoNode.type = S.lfoWave;
+  S.lfoNode.frequency.value = S.params.lfoRate;
+  S.lfoNode.start();
+  S.lfoGain = ctx.createGain();
+  S.lfoGain.gain.value = S.params.lfoPitch * 100;
+  S.lfoFiltGain = ctx.createGain();
+  S.lfoFiltGain.gain.value = S.params.lfoFilter * 2000;
+  S.lfoNode.connect(S.lfoGain);
+  S.lfoNode.connect(S.lfoFiltGain);
+
+  // ── Drift buffer (shared across voices) ──
+  S.driftBuf = buildDriftBuffer(ctx);
+
+  // ── Reverb (convolution IR) ──
+  S.reverbGain = ctx.createGain(); S.reverbGain.gain.value = S.params.reverbMix;
+  S.dryGain    = ctx.createGain(); S.dryGain.gain.value    = 1;
+  S.convolver  = ctx.createConvolver();
+  buildIR(ctx);
+
+  // ── Tape-style delay ──
+  S.delayNode = ctx.createDelay(2.0); S.delayNode.delayTime.value = 0.375;
+  S.delayFb   = ctx.createGain();     S.delayFb.gain.value = 0.38;
+  S.delayMix  = ctx.createGain();     S.delayMix.gain.value = S.params.delayMix;
+  // Slight LP filter on delay feedback (tape warmth)
+  S.delayLPF  = ctx.createBiquadFilter(); S.delayLPF.type = 'lowpass'; S.delayLPF.frequency.value = 4000;
+  S.delayNode.connect(S.delayLPF); S.delayLPF.connect(S.delayFb); S.delayFb.connect(S.delayNode);
+  S.delayNode.connect(S.delayMix);
+
+  // ── Chorus (bucket-brigade style: 2 detuned taps) ──
+  S.chorusDelay1 = ctx.createDelay(0.05); S.chorusDelay1.delayTime.value = 0.012;
+  S.chorusDelay2 = ctx.createDelay(0.05); S.chorusDelay2.delayTime.value = 0.019;
+  S.chorusMixGain = ctx.createGain(); S.chorusMixGain.gain.value = S.params.chorusMix;
+  const cLFO1 = ctx.createOscillator(); cLFO1.frequency.value = 0.7;
+  const cLFO2 = ctx.createOscillator(); cLFO2.frequency.value = 0.93;
+  const cG1   = ctx.createGain(); cG1.gain.value = 0.008;
+  const cG2   = ctx.createGain(); cG2.gain.value = 0.011;
+  cLFO1.connect(cG1); cG1.connect(S.chorusDelay1.delayTime); cLFO1.start();
+  cLFO2.connect(cG2); cG2.connect(S.chorusDelay2.delayTime); cLFO2.start();
+  // Mix both taps
+  const chorusMerge = ctx.createGain(); chorusMerge.gain.value = 0.5;
+  S.chorusDelay1.connect(chorusMerge); S.chorusDelay2.connect(chorusMerge);
+  chorusMerge.connect(S.chorusMixGain);
+
+  // ── Final routing ──
+  S.limiter.connect(S.dryGain);
+  S.limiter.connect(S.convolver);
+  S.limiter.connect(S.delayNode);
+  S.limiter.connect(S.chorusDelay1);
+  S.limiter.connect(S.chorusDelay2);
+  S.convolver.connect(S.reverbGain);
+  [S.dryGain, S.reverbGain, S.delayMix, S.chorusMixGain].forEach(n => n.connect(S.masterGain));
+  S.masterGain.connect(S.limiter);  // intentional: master → limiter → destination
+  S.masterGain.disconnect(S.limiter);  // fix: limiter is output stage
+  // Correct output chain: voices → limiter → masterGain → destination
+  S.masterGain.connect(ctx.destination);
+  // Reconnect effects to masterGain instead
+  S.limiter.disconnect();
+  S.limiter.connect(ctx.destination);
+  // Rebuild: voices → masterGain → limiter → destination
+  S.masterGain.disconnect();
+  S.limiter.disconnect();
+  [S.dryGain, S.reverbGain, S.delayMix, S.chorusMixGain].forEach(n => { try{n.disconnect()}catch(e){} });
+  // Clean final chain:
+  [S.dryGain, S.reverbGain, S.delayMix, S.chorusMixGain].forEach(n => n.connect(S.masterGain));
+  S.masterGain.connect(S.limiter);
+  S.limiter.connect(ctx.destination);
+}
+
+// ──────────────────────────────────────────────
+//  REVERB IMPULSE RESPONSE
+//  Room IR: early reflections + diffuse tail
+// ──────────────────────────────────────────────
+function buildIR(ctx) {
+  const sr = ctx.sampleRate;
+  const len = Math.floor(sr * 2.8);
+  const buf = ctx.createBuffer(2, len, sr);
+
+  for (let ch = 0; ch < 2; ch++) {
+    const d = buf.getChannelData(ch);
+    // Early reflections (first 80ms)
+    const earlyMs = [11, 19, 31, 43, 67, 79];
+    for (const ms of earlyMs) {
+      const s = Math.floor(ms * sr / 1000);
+      if (s < len) d[s] += (Math.random() * 2 - 1) * 0.6;
+    }
+    // Diffuse exponential tail
+    for (let i = 0; i < len; i++) {
+      const env = Math.pow(1 - i / len, 1.8);
+      d[i] += (Math.random() * 2 - 1) * env * 0.12;
+    }
+  }
+  // LP filter the IR for darker reverb character
+  S.convolver.buffer = buf;
+}
+
+// ──────────────────────────────────────────────
+//  MIDI FREQUENCY + DETUNE HELPERS
+// ──────────────────────────────────────────────
+function midiFreq(n) { return 440 * Math.pow(2, (n - 69) / 12); }
+
+// Each voice gets a unique drift offset so unison voices wander independently
+let _voiceSeed = 0;
+function voiceDriftOffset() {
+  // Random start position in drift buffer (0..7 seconds)
+  _voiceSeed = (_voiceSeed + 2.718 * 1000) % 8;
+  return _voiceSeed;
+}
+
+// ──────────────────────────────────────────────
+//  BUILD ONE ANALOG VOICE
+//  Signal path per voice:
+//
+//  osc1 ─┐                        ┌─ hpf1 ─ hpf2
+//         ├─ mix ─ preSat ─────── ┤
+//  osc2 ─┘    (+ breath noise)    └─ lpf1 ─ lpf2 ─ resSat ─ postSat ─ vca
+//
+//  drift source modulates osc detune (thermal VCO wander)
+// ──────────────────────────────────────────────
+function buildVoice(ctx, midi, vel, freq, now) {
+  const p = S.params;
+
+  // ── VCO 1 ──
+  const osc1 = ctx.createOscillator();
+  osc1.type = S.vco1Wave;
+  osc1.frequency.value = freq;
+  osc1.detune.value = p.vco1Freq * 100 + p.vco1Fine + S.pitchBend * 200;
+
+  // ── VCO 2 (or noise) ──
+  let osc2, isNoise = (S.vco2Wave === 'noise');
+  if (isNoise) {
+    const bsz = Math.floor(ctx.sampleRate * 3);
+    const nb  = ctx.createBuffer(1, bsz, ctx.sampleRate);
+    const nd  = nb.getChannelData(0);
+    for (let i = 0; i < bsz; i++) nd[i] = Math.random() * 2 - 1;
+    osc2 = ctx.createBufferSource(); osc2.buffer = nb; osc2.loop = true;
+  } else {
+    osc2 = ctx.createOscillator();
+    osc2.type = S.vco2Wave;
+    osc2.frequency.value = freq;
+    osc2.detune.value = p.vco2Freq * 100 + p.vco2Fine + S.pitchBend * 200;
+  }
+
+  // ── VCO level gains ──
+  const g1 = ctx.createGain(); g1.gain.value = p.vco1Level;
+  const g2 = ctx.createGain(); g2.gain.value = p.vco2Level;
+
+  // ── Thermal drift (independent per voice) ──
+  // A BufferSource playing pink noise at very low rate,
+  // connected to detune of both VCOs
+  const driftSrc  = ctx.createBufferSource();
+  driftSrc.buffer = S.driftBuf;
+  driftSrc.loop   = true;
+  driftSrc.playbackRate.value = 0.05 + Math.random() * 0.04; // very slow drift rate
+  const driftGain = ctx.createGain();
+  driftGain.gain.value = 1.0;  // ±6 cents drift range
+  driftSrc.connect(driftGain);
+  driftGain.connect(osc1.detune);
+  if (!isNoise) driftGain.connect(osc2.detune);
+
+  // ── Sub-audio breath noise (life in the signal floor) ──
+  // Very short noise burst looped + HPF so it doesn't add DC
+  const breathLen = Math.floor(ctx.sampleRate * 0.5);
+  const breathBuf = ctx.createBuffer(1, breathLen, ctx.sampleRate);
+  const bd = breathBuf.getChannelData(0);
+  for (let i = 0; i < breathLen; i++) bd[i] = (Math.random() * 2 - 1) * 0.012;
+  const breathSrc = ctx.createBufferSource();
+  breathSrc.buffer = breathBuf; breathSrc.loop = true;
+  breathSrc.playbackRate.value = 0.7 + Math.random() * 0.6;
+
+  // ── Mixer ──
+  const mixer = ctx.createGain(); mixer.gain.value = 1.0;
+  osc1.connect(g1); osc2.connect(g2);
+  g1.connect(mixer); g2.connect(mixer);
+  breathSrc.connect(mixer);
+
+  // ── PRE-FILTER SATURATION (input overdrive — very MS-20) ──
+  const preSat = ctx.createWaveShaper();
+  preSat.curve = makePreFilterCurve();
+  preSat.oversample = '4x';
+  mixer.connect(preSat);
+
+  // ── HIGH PASS FILTER (Sallen-Key style: 2 cascaded biquads, 12dB/oct each = 24dB) ──
+  const hpf1 = ctx.createBiquadFilter(); hpf1.type = 'highpass';
+  const hpf2 = ctx.createBiquadFilter(); hpf2.type = 'highpass';
+  hpf1.frequency.value = p.hpfCutoff;
+  hpf2.frequency.value = p.hpfCutoff * 1.08;  // slight spread = more analog feel
+  hpf1.Q.value = 0.6; hpf2.Q.value = 0.5;
+
+  // ── LOW PASS FILTER (Steiner-Parker style: 2 cascaded + resonance shaper) ──
+  // The Steiner-Parker filter has unique resonance character — it feeds back
+  // through the signal path and creates harmonic distortion at high Q.
+  // We simulate this by inserting a saturation node in the feedback-equivalent path.
+  const lpf1 = ctx.createBiquadFilter(); lpf1.type = 'lowpass';
+  const lpf2 = ctx.createBiquadFilter(); lpf2.type = 'lowpass';
+
+  // Q mapping: Steiner-Parker gets "biting" fast — map Q non-linearly
+  // At res=0: Q=0.6, at res=20: Q=18 with extreme character
+  const qVal  = 0.6 + Math.pow(p.resonance / 20, 1.6) * 17.5;
+  const fc    = Math.min(p.lpfCutoff, 18000);
+  lpf1.frequency.value = fc;
+  lpf2.frequency.value = fc * 0.97;  // slight spread
+  lpf1.Q.value = qVal;
+  lpf2.Q.value = qVal * 0.65;  // second pole softer
+
+  // ── Resonance saturation node (sits between lpf1 and lpf2) ──
+  // At high Q the signal through lpf1 can self-oscillate; we clip it
+  // This is what makes Steiner-Parker sound so aggressive
+  const resSat = ctx.createWaveShaper();
+  resSat.curve = makeResonanceCurve();
+  resSat.oversample = '2x';
+
+  // ── POST-FILTER SATURATION (VCA coloring) ──
+  const postSat = ctx.createWaveShaper();
+  postSat.curve = makePostFilterCurve(0.5);
+  postSat.oversample = '2x';
+
+  // ── VCA with exponential ADSR ──
+  const vca = ctx.createGain(); vca.gain.value = 0.0001;
+
+  // EG2 → VCA (exponential curves — setTargetAtTime IS exponential)
+  const atk = Math.max(0.002, p.eg2Attack);
+  const dcy = Math.max(0.02,  p.eg2Decay);
+  const sus = Math.max(0.001, p.eg2Sustain);
+  vca.gain.setValueAtTime(0.0001, now);
+  // Exponential attack via setTargetAtTime (τ = attack/3 ≈ 63% of target)
+  vca.gain.setTargetAtTime(vel * 1.1, now, atk / 3);
+  // Schedule decay to sustain level
+  vca.gain.setTargetAtTime(vel * sus, now + atk * 1.5, dcy / 3);
+
+  // ── EG1 → Filter cutoff (exponential) ──
+  const fBase   = fc;
+  const fMod    = p.filterEnvAmt * 10000;
+  const fAtk    = Math.max(0.001, p.eg1Attack);
+  const fDcy    = Math.max(0.02,  p.eg1Decay);
+  const fSus    = Math.max(0.001, p.eg1Sustain);
+  const fPeak   = Math.max(30, Math.min(20000, fBase + fMod));
+  const fSusTgt = Math.max(30, Math.min(20000, fBase + fMod * fSus));
+
+  lpf1.frequency.setValueAtTime(Math.max(30, fBase * 0.5), now);
+  lpf2.frequency.setValueAtTime(Math.max(30, fBase * 0.5 * 0.97), now);
+  lpf1.frequency.setTargetAtTime(fPeak, now, fAtk / 3);
+  lpf2.frequency.setTargetAtTime(fPeak * 0.97, now, fAtk / 3);
+  lpf1.frequency.setTargetAtTime(fSusTgt, now + fAtk * 1.5, fDcy / 3);
+  lpf2.frequency.setTargetAtTime(fSusTgt * 0.97, now + fAtk * 1.5, fDcy / 3);
+
+  // ── Signal routing ──
+  preSat.connect(hpf1); hpf1.connect(hpf2);
+  hpf2.connect(lpf1);
+  lpf1.connect(resSat); resSat.connect(lpf2);
+  lpf2.connect(postSat); postSat.connect(vca);
+  vca.connect(S.masterGain);
+
+  // ── LFO connections ──
+  S.lfoGain.connect(osc1.detune);
+  if (!isNoise) S.lfoGain.connect(osc2.detune);
+  S.lfoFiltGain.connect(lpf1.frequency);
+  S.lfoFiltGain.connect(lpf2.frequency);
+
+  // ── Start oscillators ──
+  osc1.start(now);
+  osc2.start(now);
+  driftSrc.start(now + Math.random() * 8);  // staggered start = different drift phase
+  breathSrc.start(now);
+
+  return { osc1, osc2, isNoise, g1, g2, driftSrc, driftGain, breathSrc,
+           mixer, preSat, hpf1, hpf2, lpf1, lpf2, resSat, postSat, vca, freq,
+           qVal };
+}
+
+// ──────────────────────────────────────────────
+//  NOTE ON  (with portamento glide support)
+// ──────────────────────────────────────────────
+function noteOn(midi, vel = 0.8) {
+  initAudio();
+  const ctx = S.ctx;
+  const freq = midiFreq(midi);
+  const p    = S.params;
+  const now  = ctx.currentTime;
+
+  // Steal oldest voice if at limit
+  if (S.voices.size >= S.maxVoices) {
+    noteOff(S.voiceList.shift(), true);
+  }
+  if (S.voices.has(midi)) noteOff(midi, true);
+
+  const voice = buildVoice(ctx, midi, vel, freq, now);
+
+  // Portamento: if glide > 0 and there are active voices,
+  // start from the frequency of the most recent voice
+  if (p.glide > 0 && S.voiceList.length > 0) {
+    const prevMidi = S.voiceList[S.voiceList.length - 1];
+    const prevVoice = S.voices.get(prevMidi);
+    if (prevVoice) {
+      const fromFreq = prevVoice.freq;
+      const tau = p.glide * 0.4;
+      voice.osc1.frequency.cancelScheduledValues(now);
+      voice.osc1.frequency.setValueAtTime(fromFreq, now);
+      voice.osc1.frequency.setTargetAtTime(freq, now, tau);
+      if (!voice.isNoise) {
+        voice.osc2.frequency.cancelScheduledValues(now);
+        voice.osc2.frequency.setValueAtTime(fromFreq, now);
+        voice.osc2.frequency.setTargetAtTime(freq, now, tau);
+      }
+    }
+  }
+
+  S.voices.set(midi, voice);
+  S.voiceList.push(midi);
+  flashLed();
+  updateVoiceTxt();
+}
+
+// ──────────────────────────────────────────────
+//  NOTE OFF
+// ──────────────────────────────────────────────
+function noteOff(midi, immediate = false) {
+  const v = S.voices.get(midi); if (!v) return;
+  const ctx = S.ctx, now = ctx.currentTime;
+  const rel = immediate ? 0.015 : Math.max(0.02, S.params.eg2Release);
+  const fRel = immediate ? 0.015 : Math.max(0.02, S.params.eg1Release);
+
+  // Exponential release
+  v.vca.gain.cancelScheduledValues(now);
+  v.vca.gain.setValueAtTime(Math.max(0.0001, v.vca.gain.value), now);
+  v.vca.gain.setTargetAtTime(0.0001, now, rel / 3);
+
+  // Filter release (close down)
+  const fClose = Math.max(30, S.params.hpfCutoff + 10);
+  v.lpf1.frequency.cancelScheduledValues(now);
+  v.lpf2.frequency.cancelScheduledValues(now);
+  v.lpf1.frequency.setValueAtTime(v.lpf1.frequency.value, now);
+  v.lpf2.frequency.setValueAtTime(v.lpf2.frequency.value, now);
+  v.lpf1.frequency.setTargetAtTime(fClose, now, fRel / 3);
+  v.lpf2.frequency.setTargetAtTime(fClose * 0.97, now, fRel / 3);
+
+  const stop = now + rel + 0.1;
+  try { v.osc1.stop(stop); v.osc2.stop(stop); } catch(e){}
+  try { v.driftSrc.stop(stop); v.breathSrc.stop(stop); } catch(e){}
+
+  S.voices.delete(midi);
+  const i = S.voiceList.indexOf(midi); if (i !== -1) S.voiceList.splice(i, 1);
+  updateVoiceTxt();
+}
+
+function allNotesOff() { for (const n of [...S.voices.keys()]) noteOff(n); }
+
+// ──────────────────────────────────────────────
+//  PARAM LIVE UPDATE
+// ──────────────────────────────────────────────
+function liveUpdate(param, val) {
+  S.params[param] = val;
+  if (!S.ctx) return;
+  const ctx = S.ctx, now = ctx.currentTime;
+  switch(param) {
+    case 'masterVol':  S.masterGain.gain.setTargetAtTime(val, now, 0.01); break;
+    case 'lfoRate':    S.lfoNode.frequency.setTargetAtTime(val, now, 0.05); break;
+    case 'lfoPitch':   S.lfoGain.gain.setTargetAtTime(val * 100, now, 0.05); break;
+    case 'lfoFilter':  S.lfoFiltGain.gain.setTargetAtTime(val * 2000, now, 0.05); break;
+    case 'reverbMix':  S.reverbGain.gain.setTargetAtTime(val, now, 0.05); break;
+    case 'delayMix':   S.delayMix.gain.setTargetAtTime(val, now, 0.05); break;
+    case 'chorusMix':  if(S.chorusMixGain) S.chorusMixGain.gain.setTargetAtTime(val, now, 0.05); break;
+  }
+  for (const v of S.voices.values()) {
+    switch(param) {
+      case 'lpfCutoff': {
+        const fc = Math.min(val, 18000);
+        v.lpf1.frequency.setTargetAtTime(fc, now, 0.01);
+        v.lpf2.frequency.setTargetAtTime(fc * 0.97, now, 0.01);
+        break;
+      }
+      case 'hpfCutoff': {
+        v.hpf1.frequency.setTargetAtTime(val, now, 0.01);
+        v.hpf2.frequency.setTargetAtTime(val * 1.08, now, 0.01);
+        break;
+      }
+      case 'resonance': {
+        const q = 0.6 + Math.pow(val / 20, 1.6) * 17.5;
+        v.lpf1.Q.setTargetAtTime(q, now, 0.01);
+        v.lpf2.Q.setTargetAtTime(q * 0.65, now, 0.01);
+        break;
+      }
+      case 'vco1Level': v.g1.gain.setTargetAtTime(val, now, 0.01); break;
+      case 'vco2Level': v.g2.gain.setTargetAtTime(val, now, 0.01); break;
+      case 'vco1Freq': case 'vco1Fine': {
+        const d = S.params.vco1Freq * 100 + S.params.vco1Fine + S.pitchBend * 200;
+        v.osc1.detune.setTargetAtTime(d, now, 0.01); break;
+      }
+      case 'vco2Freq': case 'vco2Fine': {
+        if (!v.isNoise) {
+          const d = S.params.vco2Freq * 100 + S.params.vco2Fine + S.pitchBend * 200;
+          v.osc2.detune.setTargetAtTime(d, now, 0.01);
+        }
+        break;
+      }
+    }
+  }
+  // clear all visual highlights
+  document.querySelectorAll('.key-w.on, .key-b.on').forEach(k => k.classList.remove('on'));
+}
+
+
+// ═══════════════════════════════════════════════
+//  KNOBS
+// ═══════════════════════════════════════════════
+function knobAngle(norm) {
+  // -135° to +135° sweep
+  return (-135 + norm * 270) * Math.PI / 180;
+}
+
+function setKnobVisual(svg, norm) {
+  const id = svg.dataset.id; if (!id) return;
+  const ind = document.getElementById(id + '-ind'); if (!ind) return;
+  const vb = svg.getAttribute('viewBox').split(' ');
+  const cx = parseFloat(vb[2]) / 2;
+  const cy = parseFloat(vb[3]) / 2;
+  const r  = cx * 0.6;
+  const a  = knobAngle(norm) - Math.PI / 2; // offset so 0°=top
+  ind.setAttribute('x2', (cx + r * Math.cos(a)).toFixed(2));
+  ind.setAttribute('y2', (cy + r * Math.sin(a)).toFixed(2));
+}
+
+function paramToNorm(svg, val) {
+  const min = +svg.dataset.min, max = +svg.dataset.max;
+  if (svg.dataset.scale === 'log') {
+    return (Math.log(Math.max(val, min)) - Math.log(min)) / (Math.log(max) - Math.log(min));
+  }
+  return (val - min) / (max - min);
+}
+
+function normToParam(svg, norm) {
+  const min = +svg.dataset.min, max = +svg.dataset.max;
+  if (svg.dataset.scale === 'log') {
+    return Math.exp(Math.log(min) + norm * (Math.log(max) - Math.log(min)));
+  }
+  return min + norm * (max - min);
+}
+
+function initKnobs() {
+  document.querySelectorAll('.knob-svg').forEach(svg => {
+    const param = svg.dataset.param; if (!param) return;
+    const def = +svg.dataset.def;
+    S.params[param] = DEFS[param] !== undefined ? DEFS[param] : def;
+    setKnobVisual(svg, paramToNorm(svg, S.params[param]));
+
+    let startY = 0, startNorm = 0, dragging = false;
+    const getY = e => e.touches ? e.touches[0].clientY : e.clientY;
+
+    const onStart = e => {
+      e.preventDefault(); initAudio();
+      dragging = true; startY = getY(e);
+      startNorm = paramToNorm(svg, S.params[param]);
+      document.addEventListener('mousemove', onMove);
+      document.addEventListener('touchmove', onMove, {passive:false});
+      document.addEventListener('mouseup', onEnd);
+      document.addEventListener('touchend', onEnd);
+    };
+    const onMove = e => {
+      if (!dragging) return; e.preventDefault();
+      const dy = startY - getY(e);
+      const norm = Math.max(0, Math.min(1, startNorm + dy / 180));
+      setKnobVisual(svg, norm);
+      liveUpdate(param, normToParam(svg, norm));
+    };
+    const onEnd = () => {
+      dragging = false;
+      document.removeEventListener('mousemove', onMove);
+      document.removeEventListener('touchmove', onMove);
+      document.removeEventListener('mouseup', onEnd);
+      document.removeEventListener('touchend', onEnd);
+    };
+    svg.addEventListener('mousedown', onStart);
+    svg.addEventListener('touchstart', onStart, {passive:false});
+    svg.addEventListener('dblclick', () => {
+      S.params[param] = def;
+      setKnobVisual(svg, paramToNorm(svg, def));
+      liveUpdate(param, def);
+    });
+  });
+}
+
+// ═══════════════════════════════════════════════
+//  KEYBOARD  (top-aligned black keys)
+// ═══════════════════════════════════════════════
+const NOTE_NAMES = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+const IS_BLACK   = [false,true,false,true,false,false,true,false,true,false,true,false];
+
+function buildKeyboard() {
+  const wrap = document.getElementById('keysWrap');
+  wrap.innerHTML = '';
+
+  // 37 keys starting from current octave
+  const startMidi = (S.octave + 1) * 12;  // C(S.octave+1)
+  const endMidi   = startMidi + 37;
+
+  const whiteEls = [];
+
+  // 1. render white keys in normal flow
+  for (let midi = startMidi; midi < endMidi; midi++) {
+    if (IS_BLACK[midi % 12]) continue;
+    const div = document.createElement('div');
+    div.className = 'key-w';
+    div.dataset.midi = midi;
+    const oct = Math.floor(midi/12) - 1;
+    if (midi % 12 === 0) {
+      const lbl = document.createElement('span');
+      lbl.className = 'note-lbl';
+      lbl.textContent = `C${oct}`;
+      div.appendChild(lbl);
+    }
+    setupKey(div);
+    wrap.appendChild(div);
+    whiteEls.push({ el: div, midi });
+  }
+
+  // 2. absolutely-position black keys AFTER white keys are in DOM
+  requestAnimationFrame(() => {
+    const wrapRect = wrap.getBoundingClientRect();
+    for (let midi = startMidi; midi < endMidi; midi++) {
+      if (!IS_BLACK[midi % 12]) continue;
+      // Find left and right white neighbours
+      const leftMidi  = midi - 1;
+      const rightMidi = midi + 1;
+      const leftEl  = wrap.querySelector(`.key-w[data-midi="${leftMidi}"]`);
+      const rightEl = wrap.querySelector(`.key-w[data-midi="${rightMidi}"]`);
+      if (!leftEl || !rightEl) continue;
+
+      const lRect = leftEl.getBoundingClientRect();
+      const rRect = rightEl.getBoundingClientRect();
+      const whiteW = lRect.width;
+      const blackW = whiteW * 0.6;
+
+      // Centre of the gap between left and right white key
+      const centre = (lRect.right + rRect.left) / 2 - wrapRect.left;
+      const left   = centre - blackW / 2;
+
+      const div = document.createElement('div');
+      div.className = 'key-b';
+      div.dataset.midi = midi;
+      div.style.left   = left.toFixed(1) + 'px';
+      div.style.width  = blackW.toFixed(1) + 'px';
+      setupKey(div);
+      wrap.appendChild(div);
+    }
+  });
+}
+
+function setupKey(el) {
+  const getMidi = () => parseInt(el.dataset.midi);
+  const on  = e => { e.preventDefault(); const v = 0.68 + Math.random()*.18; noteOn(getMidi(), v); el.classList.add('on'); };
+  const off = e => { e.preventDefault(); noteOff(getMidi()); el.classList.remove('on'); };
+  el.addEventListener('mousedown', on);
+  el.addEventListener('mouseenter', e => { if (e.buttons & 1) on(e); });
+  el.addEventListener('mouseup', off);
+  el.addEventListener('mouseleave', off);
+  el.addEventListener('touchstart', on, {passive:false});
+  el.addEventListener('touchend',   off, {passive:false});
+  el.addEventListener('touchcancel', off, {passive:false});
+}
+
+// Computer keyboard → midi notes  (A=C, W=C#, S=D … K=C)
+const KEYS_MAP = {a:0,w:1,s:2,e:3,d:4,f:5,t:6,g:7,y:8,h:9,u:10,j:11,k:12};
+document.addEventListener('keydown', e => {
+  if (e.repeat || e.target.tagName==='INPUT' || e.target.tagName==='TEXTAREA') return;
+  if (e.key==='z') { changeOct(-1); return; }
+  if (e.key==='x') { changeOct( 1); return; }
+  const off = KEYS_MAP[e.key.toLowerCase()]; if (off===undefined) return;
+  const midi = (S.octave+1)*12 + off;
+  noteOn(midi, 0.75);
+  highlight(midi, true);
+});
+document.addEventListener('keyup', e => {
+  const off = KEYS_MAP[e.key.toLowerCase()]; if (off===undefined) return;
+  const midi = (S.octave+1)*12 + off;
+  noteOff(midi);
+  highlight(midi, false);
+});
+function highlight(midi, on) {
+  const el = document.querySelector(`[data-midi="${midi}"]`);
+  if (el) el.classList.toggle('on', on);
+}
+
+// ═══════════════════════════════════════════════
+//  OCTAVE
+// ═══════════════════════════════════════════════
+function changeOct(d) {
+  S.octave = Math.max(0, Math.min(7, S.octave + d));
+  document.getElementById('octDisp').textContent = `C${S.octave}`;
+  allNotesOff();
+  buildKeyboard();  // redraw keyboard at new octave
+}
+document.getElementById('btnOctDn').addEventListener('click', () => changeOct(-1));
+document.getElementById('btnOctUp').addEventListener('click', () => changeOct( 1));
+
+// ═══════════════════════════════════════════════
+//  REALISTIC ROTARY WHEELS  — Canvas 3D cylinder
+// ═══════════════════════════════════════════════
+/*
+  We render a rubber cylinder viewed from a slight angle.
+  Technique: for each groove on the cylinder surface we project
+  the 3D circle onto 2D using a simple cylindrical perspective —
+  grooves near the visible equator (centre) appear as near-flat
+  lines; grooves near the edges curve away = foreshortened ellipses.
+
+  Model:
+    - Cylinder radius R, viewed from angle θ above equator
+    - The visible arc spans ±αMax from the front
+    - Rotation angle φ shifts all grooves
+    - Each groove at angle α from front projects to:
+        y_canvas = cy + R·sin(α)·cos(θ)          (vertical pos)
+        semiX    = R·cos(α)                        (ellipse half-width)
+        semiY    = semiX · sin(θ) · 0.18           (ellipse depth / foreshorten)
+
+  Lighting: simple diffuse — brightness = cos(α)^0.7, clipped
+*/
+
+function createWheelCanvas(housing, isPitch) {
+  const W  = 46;   // canvas width
+  const H  = 130;  // canvas height  (housing will fit to this)
+  const canvas = document.createElement('canvas');
+  canvas.width  = W;
+  canvas.height = H;
+  housing.appendChild(canvas);
+
+  const ctx   = canvas.getContext('2d');
+  const R     = W * 0.92;          // cylinder radius (wider than canvas → sides clip)
+  const cx    = W / 2;
+  const cy    = H / 2;
+  const GROOVES = 28;              // number of grooves around cylinder
+  const GROOVE_SPACING = (Math.PI * 2) / GROOVES;
+
+  // Accent colour for this wheel
+  const accentH = isPitch ? 30  : 220;   // hue: orange vs blue
+  const accentS = isPitch ? 70  : 60;
+  const accentL = isPitch ? 55  : 50;
+
+  let angle = 0;   // current rotation in radians (0 = neutral)
+
+  function draw(phi) {
+    ctx.clearRect(0, 0, W, H);
+
+    // ── background: dark rubber body ──────────────
+    const bodyGrad = ctx.createLinearGradient(0, 0, W, 0);
+    bodyGrad.addColorStop(0,    'rgb(18,16,12)');
+    bodyGrad.addColorStop(0.35, 'rgb(38,34,28)');
+    bodyGrad.addColorStop(0.5,  'rgb(52,46,38)');
+    bodyGrad.addColorStop(0.65, 'rgb(38,34,28)');
+    bodyGrad.addColorStop(1,    'rgb(14,12,10)');
+    ctx.fillStyle = bodyGrad;
+    ctx.fillRect(0, 0, W, H);
+
+    // ── edge shadow vignette ──────────────────────
+    const vigLeft  = ctx.createLinearGradient(0, 0, W * 0.28, 0);
+    vigLeft.addColorStop(0, 'rgba(0,0,0,0.7)');
+    vigLeft.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = vigLeft; ctx.fillRect(0, 0, W, H);
+
+    const vigRight = ctx.createLinearGradient(W, 0, W * 0.72, 0);
+    vigRight.addColorStop(0, 'rgba(0,0,0,0.7)');
+    vigRight.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = vigRight; ctx.fillRect(0, 0, W, H);
+
+    // ── grooves ──────────────────────────────────
+    // Collect all visible grooves, sorted by depth (back to front)
+    const grooveData = [];
+    for (let g = 0; g < GROOVES; g++) {
+      const alpha = phi + g * GROOVE_SPACING;   // angle on cylinder
+      const normA = ((alpha % (Math.PI*2)) + Math.PI*2) % (Math.PI*2);
+      // Only front hemisphere visible
+      const front = Math.cos(normA);
+      if (front < -0.08) continue;
+
+      const yPos  = cy + R * Math.sin(normA) * 0.82;  // vertical projection
+      if (yPos < -8 || yPos > H + 8) continue;
+
+      // foreshortening: at equator semiY≈0, at top/bottom semiY peaks
+      const semiX  = Math.max(1, cx * 0.94 * Math.abs(front));
+      const semiY  = Math.max(0.5, semiX * Math.abs(Math.sin(normA)) * 0.14 + 0.6);
+
+      // Lighting: diffuse cosine + ambient
+      const light  = Math.pow(Math.max(0, front), 0.5) * 0.82 + 0.14;
+      const depth  = front;  // for sorting
+
+      grooveData.push({ yPos, semiX, semiY, light, depth, front });
+    }
+    // Sort back-to-front
+    grooveData.sort((a, b) => a.depth - b.depth);
+
+    // Draw groove fills (gap between grooves = rubber ridge)
+    grooveData.forEach(g => {
+      // Rubber ridge above the groove
+      const ridgeH = Math.max(1.5, g.semiY * 1.8);
+      const ridgeGrad = ctx.createLinearGradient(0, g.yPos - ridgeH, 0, g.yPos + ridgeH);
+      const bl = Math.round(g.light * 58);
+      const bm = Math.round(g.light * 74);
+      ridgeGrad.addColorStop(0,   `rgb(${bl},${Math.round(bl*.9)},${Math.round(bl*.78)})`);
+      ridgeGrad.addColorStop(0.45,`rgb(${bm},${Math.round(bm*.92)},${Math.round(bm*.80)})`);
+      ridgeGrad.addColorStop(0.5, `rgb(${Math.round(g.light*90)},${Math.round(g.light*82)},${Math.round(g.light*68)})`);
+      ridgeGrad.addColorStop(0.55,`rgb(${bm},${Math.round(bm*.92)},${Math.round(bm*.80)})`);
+      ridgeGrad.addColorStop(1,   `rgb(${bl},${Math.round(bl*.9)},${Math.round(bl*.78)})`);
+      ctx.fillStyle = ridgeGrad;
+      ctx.beginPath();
+      ctx.ellipse(cx, g.yPos, g.semiX, ridgeH, 0, Math.PI, Math.PI*2);
+      ctx.ellipse(cx, g.yPos, g.semiX, ridgeH, 0, 0, Math.PI);
+      ctx.fill();
+
+      // Groove slot (dark notch)
+      const gd = Math.max(0.8, g.semiY);
+      const slotGrad = ctx.createLinearGradient(0, g.yPos - gd, 0, g.yPos + gd);
+      slotGrad.addColorStop(0,   'rgba(0,0,0,0.0)');
+      slotGrad.addColorStop(0.4, 'rgba(0,0,0,0.55)');
+      slotGrad.addColorStop(0.5, 'rgba(0,0,0,0.85)');
+      slotGrad.addColorStop(0.6, 'rgba(0,0,0,0.55)');
+      slotGrad.addColorStop(1,   'rgba(0,0,0,0.0)');
+      ctx.fillStyle = slotGrad;
+      ctx.beginPath();
+      ctx.ellipse(cx, g.yPos, g.semiX, gd * 2.5, 0, 0, Math.PI * 2);
+      ctx.fill();
+    });
+
+    // ── specular highlight stripe ─────────────────
+    const specGrad = ctx.createLinearGradient(0, 0, W, 0);
+    specGrad.addColorStop(0,    'rgba(255,255,240,0)');
+    specGrad.addColorStop(0.42, 'rgba(255,255,240,0)');
+    specGrad.addColorStop(0.50, 'rgba(255,255,240,0.07)');
+    specGrad.addColorStop(0.58, 'rgba(255,255,240,0)');
+    specGrad.addColorStop(1,    'rgba(255,255,240,0)');
+    ctx.fillStyle = specGrad;
+    ctx.fillRect(0, 0, W, H);
+
+    // ── centre reference marker ───────────────────
+    // A coloured stripe at the cylinder's equator face
+    const markerY = cy;
+    const mAlpha  = ((phi % (Math.PI*2)) + Math.PI*2) % (Math.PI*2);
+    const mFront  = Math.cos(mAlpha);
+    if (mFront > 0.1) {
+      const mSX = Math.max(1, cx * 0.94 * Math.abs(mFront));
+      const mSY = 1.5;
+      ctx.save();
+      ctx.globalAlpha = mFront * 0.9;
+      ctx.strokeStyle = isPitch ? `hsl(${accentH},${accentS}%,${accentL}%)` : `hsl(${accentH},${accentS}%,${accentL}%)`;
+      ctx.lineWidth   = 2.5;
+      ctx.shadowColor = isPitch ? '#e07010' : '#3060d0';
+      ctx.shadowBlur  = 5;
+      ctx.beginPath();
+      ctx.ellipse(cx, markerY, mSX, mSY, 0, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    // ── top / bottom cast shadows inside housing ──
+    const topFade = ctx.createLinearGradient(0, 0, 0, H * 0.22);
+    topFade.addColorStop(0, 'rgba(0,0,0,0.82)');
+    topFade.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = topFade; ctx.fillRect(0, 0, W, H * 0.22);
+
+    const botFade = ctx.createLinearGradient(0, H, 0, H * 0.78);
+    botFade.addColorStop(0, 'rgba(0,0,0,0.82)');
+    botFade.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = botFade; ctx.fillRect(0, H * 0.78, W, H * 0.22);
+  }
+
+  // Expose draw so caller can update rotation
+  return { canvas, draw };
+}
+
+function initWheels() {
+  makeRotaryWheel({
+    housingId: 'pitchHousing',
+    isPitch: true,
+    initNorm: 0.5,
+    springsBack: true,
+    onChange: norm => {
+      S.pitchBend = norm * 2 - 1;
+      if (!S.ctx) return;
+      const cents = S.pitchBend * 200;
+      for (const v of S.voices.values()) {
+        v.osc1.detune.setTargetAtTime(
+          S.params.vco1Freq*100 + S.params.vco1Fine + cents,
+          S.ctx.currentTime, .01);
+        if (S.vco2Wave !== 'noise')
+          v.osc2.detune.setTargetAtTime(
+            S.params.vco2Freq*100 + S.params.vco2Fine + cents,
+            S.ctx.currentTime, .01);
+      }
+    }
+  });
+
+  makeRotaryWheel({
+    housingId: 'modHousing',
+    isPitch: false,
+    initNorm: 0,
+    springsBack: false,
+    onChange: norm => {
+      if (!S.ctx) return;
+      S.lfoGain.gain.setTargetAtTime(
+        (S.params.lfoPitch + norm * 0.5) * 100,
+        S.ctx.currentTime, .01);
+    }
+  });
+}
+
+function makeRotaryWheel({ housingId, isPitch, initNorm, springsBack, onChange }) {
+  const housing = document.getElementById(housingId);
+  const { canvas, draw } = createWheelCanvas(housing, isPitch);
+
+  // Map norm [0,1] → rotation angle.
+  // We want full travel ≈ ±3 full groove spacings visible
+  const TURNS = Math.PI * 3;
+  let currentNorm = initNorm;
+
+  const normToAngle = n => (n - 0.5) * TURNS * 2;  // centred at 0
+
+  const render = n => {
+    draw(normToAngle(n));
+    onChange(n);
+  };
+
+  // Initial draw after layout
+  requestAnimationFrame(() => render(initNorm));
+
+  let dragging = false, startY = 0, startNorm = initNorm;
+  const getY = e => e.touches ? e.touches[0].clientY : e.clientY;
+
+  const onStart = e => {
+    e.preventDefault();
+    dragging  = true;
+    startY    = getY(e);
+    startNorm = currentNorm;
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('touchmove', onMove, { passive: false });
+    document.addEventListener('mouseup',   onEnd);
+    document.addEventListener('touchend',  onEnd);
+  };
+
+  const onMove = e => {
+    if (!dragging) return;
+    e.preventDefault();
+    const dy   = startY - getY(e);
+    const norm = Math.max(0, Math.min(1, startNorm + dy / 90));
+    currentNorm = norm;
+    render(norm);
+  };
+
+  const onEnd = () => {
+    if (!dragging) return;
+    dragging = false;
+    document.removeEventListener('mousemove', onMove);
+    document.removeEventListener('touchmove', onMove);
+    document.removeEventListener('mouseup',   onEnd);
+    document.removeEventListener('touchend',  onEnd);
+    if (springsBack) {
+      const from   = currentNorm;
+      const to     = 0.5;
+      const steps  = 22;
+      let   step   = 0;
+      const tick = () => {
+        step++;
+        const t = step / steps;
+        const e = 1 - Math.pow(1 - t, 3);
+        const n = from + (to - from) * e;
+        currentNorm = n;
+        render(n);
+        if (step < steps) requestAnimationFrame(tick);
+      };
+      requestAnimationFrame(tick);
+    }
+  };
+
+  housing.addEventListener('mousedown',  onStart);
+  housing.addEventListener('touchstart', onStart, { passive: false });
+}
+
+
+// ═══════════════════════════════════════════════
+//  MIDI
+// ═══════════════════════════════════════════════
+function initMIDI() {
+  if (!navigator.requestMIDIAccess) return;
+  navigator.requestMIDIAccess().then(acc => {
+    document.getElementById('midiTxt').textContent = 'MIDI OK';
+    document.getElementById('midiLed').classList.add('on');
+    toast('MIDI CONNECTED');
+    const connect = inp => {
+      inp.onmidimessage = msg => {
+        initAudio();
+        const [st, d1, d2] = msg.data, cmd = st & 0xF0;
+        if (cmd===0x90 && d2>0) { noteOn(d1, d2/127); highlight(d1, true); }
+        else if (cmd===0x80 || (cmd===0x90 && d2===0)) { noteOff(d1); highlight(d1, false); }
+        else if (cmd===0xE0) { const b=((d2<<7)|d1)-8192; S.pitchBend=b/8192; }
+        else if (cmd===0xB0) {
+          if (d1===1) { if(S.lfoFiltGain) S.lfoGain.gain.setTargetAtTime((S.params.lfoPitch+d2/127*.5)*100,S.ctx.currentTime,.01); }
+          else if (d1===7) { const v=d2/127; liveUpdate('masterVol',v); const s=document.querySelector('[data-param="masterVol"]'); if(s){setKnobVisual(s,paramToNorm(s,v));} }
+          else if (d1===123||d1===120) allNotesOff();
+        }
+      };
+    };
+    for (const i of acc.inputs.values()) connect(i);
+    acc.onstatechange = e => { if (e.port.type==='input'&&e.port.state==='connected') { connect(e.port); toast(`MIDI: ${e.port.name}`); } };
+  }).catch(() => { document.getElementById('midiTxt').textContent = 'DENIED'; });
+}
+
+// ═══════════════════════════════════════════════
+//  PRESETS
+// ═══════════════════════════════════════════════
+// ═══════════════════════════════════════════════
+//  FACTORY PRESETS  (Robert Miles / Jean-Michel Jarre inspired)
+// ═══════════════════════════════════════════════
+const FACTORY_PRESETS = [
+  // 1 ── "CHILDREN" (Robert Miles — dreamy trance piano)
+  {
+    name: 'CHILDREN',
+    params: {
+      vco1Freq:0,  vco1Fine:0,    vco1PW:0.5,  vco1Level:0.85,
+      vco2Freq:0,  vco2Fine:6,    vco2PW:0.5,  vco2Level:0.35,
+      hpfCutoff:20, lpfCutoff:3200, resonance:1.2, filterEnvAmt:0.22,
+      eg1Attack:0.004, eg1Decay:0.9,  eg1Sustain:0.3, eg1Release:1.2,
+      eg2Attack:0.003, eg2Decay:0.5,  eg2Sustain:0.55, eg2Release:1.8,
+      lfoRate:4.5, lfoPitch:0.03, lfoFilter:0.08,
+      reverbMix:0.45, delayMix:0.18, chorusMix:0.35,
+      masterVol:0.75, glide:0,
+    },
+    vco1Wave:'triangle', vco2Wave:'sawtooth', lfoWave:'sine', octave:3,
+  },
+
+  // 2 ── "FUGA 1497" (Robert Miles — hypnotic trance bass)
+  {
+    name: 'FUGA 1497',
+    params: {
+      vco1Freq:0,  vco1Fine:0,   vco1PW:0.3,  vco1Level:0.9,
+      vco2Freq:-12, vco2Fine:0,  vco2PW:0.3,  vco2Level:0.6,
+      hpfCutoff:55, lpfCutoff:600, resonance:12, filterEnvAmt:0.7,
+      eg1Attack:0.001, eg1Decay:0.22, eg1Sustain:0.18, eg1Release:0.3,
+      eg2Attack:0.001, eg2Decay:0.18, eg2Sustain:0.0,  eg2Release:0.25,
+      lfoRate:0.3, lfoPitch:0, lfoFilter:0.12,
+      reverbMix:0.1, delayMix:0.22, chorusMix:0.0,
+      masterVol:0.75, glide:0.04,
+    },
+    vco1Wave:'sawtooth', vco2Wave:'sawtooth', lfoWave:'sine', octave:2,
+  },
+
+  // 3 ── "DREAMLAND" (Robert Miles — floating pad)
+  {
+    name: 'DREAMLAND',
+    params: {
+      vco1Freq:0,   vco1Fine:0,   vco1PW:0.5,  vco1Level:0.7,
+      vco2Freq:7,   vco2Fine:12,  vco2PW:0.5,  vco2Level:0.55,
+      hpfCutoff:40, lpfCutoff:1800, resonance:2.5, filterEnvAmt:0.15,
+      eg1Attack:0.8, eg1Decay:1.5,  eg1Sustain:0.6, eg1Release:2.0,
+      eg2Attack:0.9, eg2Decay:0.5,  eg2Sustain:0.8, eg2Release:2.5,
+      lfoRate:0.6,  lfoPitch:0.04, lfoFilter:0.2,
+      reverbMix:0.65, delayMix:0.3, chorusMix:0.55,
+      masterVol:0.7, glide:0.12,
+    },
+    vco1Wave:'sawtooth', vco2Wave:'triangle', lfoWave:'sine', octave:3,
+  },
+
+  // 4 ── "OXYGENE IV" (Jean-Michel Jarre — iconic sweeping lead)
+  {
+    name: 'OXYGENE IV',
+    params: {
+      vco1Freq:0,   vco1Fine:0,    vco1PW:0.45, vco1Level:0.85,
+      vco2Freq:0,   vco2Fine:-8,   vco2PW:0.55, vco2Level:0.5,
+      hpfCutoff:30, lpfCutoff:900, resonance:16, filterEnvAmt:0.85,
+      eg1Attack:0.005, eg1Decay:0.4,  eg1Sustain:0.35, eg1Release:0.6,
+      eg2Attack:0.005, eg2Decay:0.3,  eg2Sustain:0.65, eg2Release:0.5,
+      lfoRate:5.5, lfoPitch:0.0, lfoFilter:0.35,
+      reverbMix:0.3, delayMix:0.0, chorusMix:0.2,
+      masterVol:0.75, glide:0.06,
+    },
+    vco1Wave:'sawtooth', vco2Wave:'sawtooth', lfoWave:'triangle', octave:3,
+  },
+
+  // 5 ── "EQUINOXE" (Jean-Michel Jarre — pulsing sequence)
+  {
+    name: 'EQUINOXE',
+    params: {
+      vco1Freq:0,    vco1Fine:0,    vco1PW:0.25, vco1Level:0.9,
+      vco2Freq:-12,  vco2Fine:5,    vco2PW:0.25, vco2Level:0.7,
+      hpfCutoff:80,  lpfCutoff:450, resonance:18, filterEnvAmt:1.0,
+      eg1Attack:0.001, eg1Decay:0.15, eg1Sustain:0.05, eg1Release:0.2,
+      eg2Attack:0.001, eg2Decay:0.12, eg2Sustain:0.0,  eg2Release:0.15,
+      lfoRate:0.4, lfoPitch:0.0, lfoFilter:0.0,
+      reverbMix:0.12, delayMix:0.38, chorusMix:0.0,
+      masterVol:0.75, glide:0.0,
+    },
+    vco1Wave:'square', vco2Wave:'square', lfoWave:'square', octave:2,
+  },
+
+  // 6 ── "LASER HARP" (Jean-Michel Jarre — bright pluck)
+  {
+    name: 'LASER HARP',
+    params: {
+      vco1Freq:0,   vco1Fine:0,   vco1PW:0.5,  vco1Level:0.8,
+      vco2Freq:12,  vco2Fine:3,   vco2PW:0.5,  vco2Level:0.4,
+      hpfCutoff:20, lpfCutoff:12000, resonance:4, filterEnvAmt:-0.35,
+      eg1Attack:0.001, eg1Decay:0.55, eg1Sustain:0.0, eg1Release:0.4,
+      eg2Attack:0.001, eg2Decay:0.45, eg2Sustain:0.0, eg2Release:0.35,
+      lfoRate:7.2, lfoPitch:0.0, lfoFilter:0.0,
+      reverbMix:0.55, delayMix:0.22, chorusMix:0.15,
+      masterVol:0.75, glide:0.0,
+    },
+    vco1Wave:'triangle', vco2Wave:'sine', lfoWave:'sine', octave:4,
+  },
+
+  // 7 ── "ZOOLOOK" (Jean-Michel Jarre — noise texture pad)
+  {
+    name: 'ZOOLOOK',
+    params: {
+      vco1Freq:0,   vco1Fine:0,   vco1PW:0.5,  vco1Level:0.6,
+      vco2Freq:0,   vco2Fine:0,   vco2PW:0.5,  vco2Level:0.8,
+      hpfCutoff:200, lpfCutoff:2500, resonance:8, filterEnvAmt:0.4,
+      eg1Attack:0.25, eg1Decay:0.8, eg1Sustain:0.5, eg1Release:1.2,
+      eg2Attack:0.3,  eg2Decay:0.6, eg2Sustain:0.65, eg2Release:1.5,
+      lfoRate:0.9, lfoPitch:0.05, lfoFilter:0.3,
+      reverbMix:0.5, delayMix:0.2, chorusMix:0.4,
+      masterVol:0.7, glide:0.2,
+    },
+    vco1Wave:'sawtooth', vco2Wave:'noise', lfoWave:'triangle', octave:3,
+  },
+
+  // 8 ── "ONE AND ONE" (Robert Miles — warm chord pad)
+  {
+    name: 'ONE AND ONE',
+    params: {
+      vco1Freq:0,   vco1Fine:0,   vco1PW:0.5,  vco1Level:0.75,
+      vco2Freq:7,   vco2Fine:-7,  vco2PW:0.5,  vco2Level:0.6,
+      hpfCutoff:30, lpfCutoff:2200, resonance:1.5, filterEnvAmt:0.12,
+      eg1Attack:0.5,  eg1Decay:1.2, eg1Sustain:0.7, eg1Release:1.8,
+      eg2Attack:0.45, eg2Decay:0.5, eg2Sustain:0.8, eg2Release:2.2,
+      lfoRate:0.5, lfoPitch:0.025, lfoFilter:0.1,
+      reverbMix:0.6, delayMix:0.25, chorusMix:0.45,
+      masterVol:0.72, glide:0.08,
+    },
+    vco1Wave:'sawtooth', vco2Wave:'sawtooth', lfoWave:'sine', octave:3,
+  },
+];
+
+// ═══════════════════════════════════════════════
+//  PRESETS
+// ═══════════════════════════════════════════════
+function buildPresetBank() {
+  const bank = document.getElementById('presetBank');
+  bank.innerHTML = '';
+  S.presets = loadPresets();
+  for (let i = 0; i < 8; i++) {
+    const fp  = FACTORY_PRESETS[i];
+    const btn = document.createElement('button');
+    btn.className = 'preset-btn';
+    btn.dataset.slot = i;
+
+    // show factory name under number
+    btn.innerHTML = `<span style="display:block;font-size:11px;line-height:1;">${i+1}</span><span style="display:block;font-size:5.5px;letter-spacing:.3px;color:inherit;margin-top:1px;max-width:36px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${fp.name}</span>`;
+    btn.style.width  = '42px';
+    btn.style.height = '34px';
+    btn.style.flexDirection = 'column';
+
+    if (S.presets[i]) btn.classList.add('has-data');
+    else              btn.classList.add('factory');
+    if (S.activePreset === i) btn.classList.add('active');
+
+    btn.addEventListener('click', () => doLoadPreset(i));
+    btn.addEventListener('contextmenu', e => { e.preventDefault(); showCtxMenu(i, e.clientX, e.clientY); });
+    bank.appendChild(btn);
+  }
+}
+
+function captureState() {
+  return { params:{...S.params}, vco1Wave:S.vco1Wave, vco2Wave:S.vco2Wave, lfoWave:S.lfoWave, octave:S.octave };
+}
+
+function applyState(st) {
+  if (!st) return;
+  Object.assign(S.params, st.params);
+  S.vco1Wave = st.vco1Wave || 'sawtooth';
+  S.vco2Wave = st.vco2Wave || 'square';
+  S.lfoWave  = st.lfoWave  || 'sine';
+  if (st.octave!==undefined) S.octave = st.octave;
+  document.querySelectorAll('.knob-svg').forEach(s => {
+    const p = s.dataset.param;
+    if (p && S.params[p]!==undefined) {
+      setKnobVisual(s, paramToNorm(s, S.params[p]));
+      if (S.ctx) liveUpdate(p, S.params[p]);
+    }
+  });
+  document.getElementById('octDisp').textContent = `C${S.octave}`;
+  // update wave selectors
+  ['wv1','wv2','wvL'].forEach(id => {
+    const key  = id==='wv1'?'vco1Wave':id==='wv2'?'vco2Wave':'lfoWave';
+    const val  = S[key];
+    document.querySelectorAll(`#${id} .wave-btn`).forEach(b => {
+      const active = b.dataset.wave === val;
+      b.classList.toggle('active', active);
+      b.style.color = active ? 'var(--ms-orange)' : 'var(--ms-cream2)';
+    });
+  });
+}
+
+function doSavePreset(slot) {
+  S.presets[slot] = captureState();
+  savePresets();
+  S.activePreset = slot;
+  buildPresetBank();
+  toast(`PRESET ${slot+1} SAVED`);
+}
+function doLoadPreset(slot) {
+  // User save takes priority; fallback to factory
+  const st = S.presets[slot] || FACTORY_PRESETS[slot];
+  if (st) {
+    applyState(st);
+    S.activePreset = slot;
+    buildPresetBank();
+    const name = FACTORY_PRESETS[slot] ? FACTORY_PRESETS[slot].name : String(slot+1);
+    toast(`${slot+1}: ${S.presets[slot] ? 'USER' : name}`);
+  }
+}
+function doClearPreset(slot) {
+  S.presets[slot] = null;
+  savePresets();
+  if (S.activePreset === slot) S.activePreset = null;
+  buildPresetBank();
+  toast(`SLOT ${slot+1} RESET TO FACTORY`);
+}
+function savePresets()  { try { localStorage.setItem('ms20web_v3', JSON.stringify(S.presets)); } catch(e) {} }
+function loadPresets()  { try { const d = localStorage.getItem('ms20web_v3'); return d ? JSON.parse(d) : Array(8).fill(null); } catch(e) { return Array(8).fill(null); } }
+
+document.getElementById('btnSave').addEventListener('click', () => doSavePreset(S.activePreset ?? 0));
+document.getElementById('btnExport').addEventListener('click', () => {
+  const blob = new Blob([JSON.stringify({presets:S.presets,current:captureState()},null,2)],{type:'application/json'});
+  const a = document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='ms20web-patch.json'; a.click(); toast('EXPORTED');
+});
+document.getElementById('btnImport').addEventListener('click', () => document.getElementById('fileIn').click());
+document.getElementById('fileIn').addEventListener('change', e => {
+  const f = e.target.files[0]; if(!f) return;
+  const r = new FileReader();
+  r.onload = ev => { try{ const d=JSON.parse(ev.target.result); if(d.presets) S.presets=d.presets; savePresets(); if(d.current) applyState(d.current); buildPresetBank(); toast('IMPORTED'); }catch(e){ toast('IMPORT ERROR'); } };
+  r.readAsText(f); e.target.value='';
+});
+document.getElementById('btnShare').addEventListener('click', () => {
+  const url = location.href.split('?')[0]+'?patch='+encodeURIComponent(btoa(JSON.stringify(captureState())));
+  document.getElementById('shareUrl').value = url;
+  document.getElementById('shareModal').classList.add('show');
+});
+document.getElementById('btnCloseModal').addEventListener('click', () => document.getElementById('shareModal').classList.remove('show'));
+document.getElementById('btnCopyUrl').addEventListener('click', () => {
+  navigator.clipboard.writeText(document.getElementById('shareUrl').value).then(() => { toast('URL COPIED'); document.getElementById('shareModal').classList.remove('show'); });
+});
+
+// Context menu
+function showCtxMenu(slot, x, y) {
+  S.ctxSlot = slot;
+  const m = document.getElementById('ctxMenu');
+  m.style.left = x+'px'; m.style.top = y+'px';
+  m.classList.add('show');
+}
+document.getElementById('ctxSave').addEventListener('click',  () => { if(S.ctxSlot!==null) doSavePreset(S.ctxSlot);  document.getElementById('ctxMenu').classList.remove('show'); });
+document.getElementById('ctxLoad').addEventListener('click',  () => { if(S.ctxSlot!==null) doLoadPreset(S.ctxSlot);  document.getElementById('ctxMenu').classList.remove('show'); });
+document.getElementById('ctxClear').addEventListener('click', () => { if(S.ctxSlot!==null) doClearPreset(S.ctxSlot); document.getElementById('ctxMenu').classList.remove('show'); });
+document.addEventListener('click', e => { if(!e.target.closest('#ctxMenu')&&!e.target.closest('.preset-btn')) document.getElementById('ctxMenu').classList.remove('show'); });
+
+// Load from URL
+function loadFromURL() {
+  const p = new URLSearchParams(location.search).get('patch');
+  if (p) { try{ applyState(JSON.parse(atob(decodeURIComponent(p)))); toast('PATCH LOADED'); }catch(e){} }
+}
+
+// ═══════════════════════════════════════════════
+//  HELPERS
+// ═══════════════════════════════════════════════
+function updateVoiceTxt() {
+  const n = S.voices.size;
+  document.getElementById('voiceTxt').textContent = n + (n===1?' VOICE':' VOICES');
+}
+
+let ledTimer;
+function flashLed() {
+  const led = document.getElementById('midiLed');
+  led.classList.add('on');
+  clearTimeout(ledTimer);
+  ledTimer = setTimeout(() => { if(document.getElementById('midiTxt').textContent!=='MIDI OK') led.classList.remove('on'); }, 80);
+}
+
+let toastT;
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.classList.add('show');
+  clearTimeout(toastT); toastT = setTimeout(() => el.classList.remove('show'), 2000);
+}
+
+// Resize re-positions black keys
+let rzTimer;
+window.addEventListener('resize', () => { clearTimeout(rzTimer); rzTimer = setTimeout(buildKeyboard, 200); });
+
+// ═══════════════════════════════════════════════
+//  STATUS LOOP
+// ═══════════════════════════════════════════════
+const MSGS = ['BORG XS-20 · READY','CLICK KEYS TO PLAY','A-K = C–C  Z/X = OCT','DBLCLICK KNOB = RESET','MIDI KEYBOARD SUPPORTED'];
+let msgI = 0;
+setInterval(() => { document.getElementById('statusBar').textContent = MSGS[msgI=(msgI+1)%MSGS.length]; }, 3500);
+
+// ═══════════════════════════════════════════════
+//  OAK WOOD SIDE PANELS  — Canvas procedural
+// ═══════════════════════════════════════════════
+/*
+  Renders a convincing oak wood grain texture:
+  1. Base warm honey/amber gradient
+  2. Layered Perlin-like noise grain lines (bezier curves with
+     slight random deviation) — lighter/darker bands
+  3. Fine micro-grain overlay
+  4. Knot simulation (optional, subtle)
+  5. Varnish sheen — left-edge specular highlight
+  6. Dark edge shadows top/bottom + inner edge
+*/
+
+function drawWoodPanel(canvas, side) {
+  const W = canvas.width;
+  const H = canvas.height;
+  const ctx = canvas.getContext('2d');
+
+  // ── 1. base oak gradient ─────────────────────
+  const base = ctx.createLinearGradient(0, 0, W, 0);
+  if (side === 'left') {
+    base.addColorStop(0,    '#2a1a08');
+    base.addColorStop(0.12, '#5c3210');
+    base.addColorStop(0.35, '#8b5a22');
+    base.addColorStop(0.55, '#a8703a');
+    base.addColorStop(0.72, '#c4894e');
+    base.addColorStop(0.88, '#b07038');
+    base.addColorStop(1,    '#704018');
+  } else {
+    base.addColorStop(0,    '#704018');
+    base.addColorStop(0.12, '#b07038');
+    base.addColorStop(0.28, '#c4894e');
+    base.addColorStop(0.45, '#a8703a');
+    base.addColorStop(0.65, '#8b5a22');
+    base.addColorStop(0.88, '#5c3210');
+    base.addColorStop(1,    '#2a1a08');
+  }
+  ctx.fillStyle = base;
+  ctx.fillRect(0, 0, W, H);
+
+  // ── 2. wood grain lines ───────────────────────
+  // Seeded pseudo-random for reproducible texture
+  let seed = side === 'left' ? 42 : 137;
+  const rng = () => { seed = (seed * 1664525 + 1013904223) & 0xffffffff; return (seed >>> 0) / 0xffffffff; };
+
+  const GRAIN_COUNT = 80;
+  for (let g = 0; g < GRAIN_COUNT; g++) {
+    const yBase   = rng() * H;
+    const waviness = 2 + rng() * 6;
+    const period   = H * (0.3 + rng() * 1.2);
+    const phase    = rng() * Math.PI * 2;
+    const dark     = rng() > 0.5;
+    const alpha    = 0.04 + rng() * 0.13;
+    const lineW    = 0.4 + rng() * 1.8;
+
+    ctx.beginPath();
+    ctx.moveTo(0, yBase);
+
+    const steps = 24;
+    for (let i = 1; i <= steps; i++) {
+      const x  = (i / steps) * W;
+      const y  = yBase + Math.sin((x / period) * Math.PI * 2 + phase) * waviness
+                       + Math.sin((x / (period * 0.3)) * Math.PI * 2 + phase * 1.7) * (waviness * 0.3);
+      const px = ((i - 0.5) / steps) * W;
+      const py = yBase + Math.sin((px / period) * Math.PI * 2 + phase) * waviness;
+      ctx.quadraticCurveTo(px, py, x, y);
+    }
+
+    ctx.strokeStyle = dark
+      ? `rgba(30,14,4,${alpha})`
+      : `rgba(230,180,100,${alpha * 0.7})`;
+    ctx.lineWidth  = lineW;
+    ctx.stroke();
+  }
+
+  // ── 3. fine micro-grain ───────────────────────
+  for (let g = 0; g < 200; g++) {
+    const y     = rng() * H;
+    const len   = W * (0.1 + rng() * 0.6);
+    const x0    = rng() * (W - len);
+    const alpha = 0.02 + rng() * 0.05;
+    ctx.beginPath();
+    ctx.moveTo(x0, y);
+    ctx.lineTo(x0 + len, y + (rng() - 0.5) * 1.5);
+    ctx.strokeStyle = rng() > 0.5 ? `rgba(20,8,2,${alpha})` : `rgba(220,160,80,${alpha})`;
+    ctx.lineWidth = 0.4 + rng() * 0.5;
+    ctx.stroke();
+  }
+
+  // ── 4. subtle knot ────────────────────────────
+  for (let k = 0; k < 2; k++) {
+    const kx = W * (0.2 + rng() * 0.6);
+    const ky = H * (0.15 + rng() * 0.7);
+    const kr = 4 + rng() * 9;
+    // dark ring
+    const kg = ctx.createRadialGradient(kx, ky, 0, kx, ky, kr * 2.5);
+    kg.addColorStop(0,   'rgba(18,8,2,0.45)');
+    kg.addColorStop(0.4, 'rgba(18,8,2,0.22)');
+    kg.addColorStop(0.7, 'rgba(80,40,10,0.08)');
+    kg.addColorStop(1,   'rgba(0,0,0,0)');
+    ctx.fillStyle = kg;
+    ctx.beginPath();
+    ctx.ellipse(kx, ky, kr * 2.5, kr * 1.6, rng() * Math.PI, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  // ── 5. varnish sheen ─────────────────────────
+  const sheen = ctx.createLinearGradient(0, 0, W, 0);
+  if (side === 'left') {
+    sheen.addColorStop(0,    'rgba(255,230,180,0.0)');
+    sheen.addColorStop(0.18, 'rgba(255,230,180,0.18)');
+    sheen.addColorStop(0.35, 'rgba(255,220,160,0.08)');
+    sheen.addColorStop(1,    'rgba(255,230,180,0.0)');
+  } else {
+    sheen.addColorStop(0,    'rgba(255,230,180,0.0)');
+    sheen.addColorStop(0.65, 'rgba(255,220,160,0.08)');
+    sheen.addColorStop(0.82, 'rgba(255,230,180,0.18)');
+    sheen.addColorStop(1,    'rgba(255,230,180,0.0)');
+  }
+  ctx.fillStyle = sheen;
+  ctx.fillRect(0, 0, W, H);
+
+  // ── 6. edge shadows ───────────────────────────
+  // top fade
+  const topFade = ctx.createLinearGradient(0, 0, 0, Math.min(H * 0.08, 40));
+  topFade.addColorStop(0, 'rgba(0,0,0,0.55)');
+  topFade.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.fillStyle = topFade;
+  ctx.fillRect(0, 0, W, Math.min(H * 0.08, 40));
+
+  // bottom fade
+  const botFade = ctx.createLinearGradient(0, H, 0, H - Math.min(H * 0.08, 40));
+  botFade.addColorStop(0, 'rgba(0,0,0,0.55)');
+  botFade.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.fillStyle = botFade;
+  ctx.fillRect(0, H - Math.min(H * 0.08, 40), W, Math.min(H * 0.08, 40));
+
+  // inner edge shadow (where wood meets chassis)
+  const innerShadow = ctx.createLinearGradient(
+    side === 'left' ? W : 0, 0,
+    side === 'left' ? W - 10 : 10, 0
+  );
+  innerShadow.addColorStop(0, 'rgba(0,0,0,0.6)');
+  innerShadow.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.fillStyle = innerShadow;
+  ctx.fillRect(0, 0, W, H);
+
+  // outer edge highlight
+  const outerHL = ctx.createLinearGradient(
+    side === 'left' ? 0 : W, 0,
+    side === 'left' ? 6 : W - 6, 0
+  );
+  outerHL.addColorStop(0, 'rgba(255,200,120,0.22)');
+  outerHL.addColorStop(1, 'rgba(255,200,120,0)');
+  ctx.fillStyle = outerHL;
+  ctx.fillRect(0, 0, W, H);
+}
+
+function initWoodPanels() {
+  const frame  = document.querySelector('.synth-frame');
+  const left   = document.getElementById('woodLeft');
+  const right  = document.getElementById('woodRight');
+
+  const resize = () => {
+    const H = frame.offsetHeight || 600;
+    const W = 36;
+    [left, right].forEach(c => {
+      c.width  = W * devicePixelRatio;
+      c.height = H * devicePixelRatio;
+      c.style.width  = W + 'px';
+      c.style.height = H + 'px';
+      const ctx = c.getContext('2d');
+      ctx.scale(devicePixelRatio, devicePixelRatio);
+    });
+    drawWoodPanel(left,  'left');
+    drawWoodPanel(right, 'right');
+  };
+
+  // Draw after layout is complete
+  requestAnimationFrame(() => requestAnimationFrame(resize));
+  window.addEventListener('resize', () => { clearTimeout(rzTimer); rzTimer = setTimeout(resize, 200); });
+}
+
+// ═══════════════════════════════════════════════
+//  BOOT
+// ═══════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', () => {
+  buildWaveSelectors();
+  initKnobs();
+  buildKeyboard();
+  buildPresetBank();
+  initWheels();
+  initMIDI();
+  loadFromURL();
+  initWoodPanels();
+  // Load factory preset 1 (CHILDREN) as default patch
+  if (!new URLSearchParams(location.search).get('patch')) {
+    applyState(FACTORY_PRESETS[0]);
+    S.activePreset = 0;
+    buildPresetBank();
+  }
+});
+</script>
+</body>
+</html>
