@@ -346,49 +346,27 @@ body {
   flex-shrink: 0;
   width: clamp(22px, 3.2vw, 36px);
   height: 100%;
-  background: linear-gradient(180deg,
-    #cfcaba 0%, #e9e5d8 6%,
-    #f3efe4 30%, #f8f4ea 62%,
-    #ece7d8 88%, #d9d3c2 100%);
-  border-left:   1px solid #a89f88;
-  border-right:  1px solid #a89f88;
-  border-bottom: 1px solid #857c64;
-  border-radius: 0 0 4px 4px;
+  background: linear-gradient(180deg, #e8e4d8 0%, #f5f1e8 55%, #ddd8c8 100%);
+  border-left:   1px solid #b0a890;
+  border-right:  1px solid #b0a890;
+  border-bottom: 1px solid #908870;
+  border-radius: 0 0 5px 5px;
   cursor: pointer;
   z-index: 1;
   transition: background .04s;
   box-shadow:
-    inset 0 2px 1px rgba(255,255,255,.75),
-    inset 2px 0 3px -2px rgba(60,50,30,.35),
-    inset -2px 0 3px -2px rgba(60,50,30,.35),
-    inset 0 -7px 9px -4px rgba(70,58,36,.28),
-    0 5px 7px rgba(0,0,0,.5);
-}
-/* front edge — the visible vertical face at the key's tip */
-.key-w::after {
-  content: '';
-  position: absolute; left: 0; right: 0; bottom: 0;
-  height: 6px;
-  background: linear-gradient(180deg, rgba(120,105,75,.30) 0%, rgba(245,240,228,.9) 30%, rgba(150,138,108,.55) 100%);
-  border-radius: 0 0 4px 4px;
-  pointer-events: none;
+    inset 0 -4px 8px rgba(0,0,0,.12),
+    1px 0 0 rgba(255,255,255,.35),
+    0 4px 8px rgba(0,0,0,.5);
 }
 .key-w:hover {
-  background: linear-gradient(180deg,
-    #d6d1c2 0%, #f0ece0 6%,
-    #faf6ec 30%, #fefbf2 62%,
-    #f2eee0 88%, #e0dbc9 100%);
+  background: linear-gradient(180deg, #f0ece0 0%, #fdfaf0 55%, #e8e4d4 100%);
 }
 .key-w.on {
-  background: linear-gradient(180deg, #d89820 0%, #eab838 40%, #f0c34a 62%, #c07f14 100%) !important;
-  box-shadow:
-    inset 0 4px 8px rgba(90,50,0,.35),
-    inset 2px 0 3px -2px rgba(60,30,0,.4),
-    inset -2px 0 3px -2px rgba(60,30,0,.4),
-    0 2px 3px rgba(0,0,0,.5);
+  background: linear-gradient(180deg, #e8a828 0%, #f0c040 55%, #c88818 100%) !important;
+  box-shadow: inset 0 3px 6px rgba(0,0,0,.2), 0 2px 4px rgba(0,0,0,.5);
   transform: translateY(2px);
 }
-.key-w.on::after { opacity: .45; }
 .key-w .note-lbl {
   position: absolute; bottom: 5px;
   left: 0; right: 0; text-align: center;
@@ -403,48 +381,27 @@ body {
   z-index: 2;
   /* width and height set via JS to stay proportional */
   height: 60%;
-  background:
-    linear-gradient(90deg, rgba(70,68,58,.55) 0%, rgba(0,0,0,0) 12%, rgba(0,0,0,0) 82%, rgba(0,0,0,.65) 100%),
-    linear-gradient(180deg, #32322a 0%, #22221c 45%, #131310 78%, #0a0a08 100%);
+  background: linear-gradient(180deg, #282820 0%, #1a1a14 55%, #0e0e0a 100%);
   border: 1px solid #3a3830;
-  border-top: none;
-  border-radius: 0 0 3px 3px;
+  border-radius: 0 0 4px 4px;
   cursor: pointer;
   box-shadow:
-    inset 1px 0 1px rgba(255,255,255,.10),
-    inset -2px 0 4px rgba(0,0,0,.7),
-    3px 6px 9px rgba(0,0,0,.75);
+    inset -2px 0 3px rgba(0,0,0,.6),
+    2px 5px 10px rgba(0,0,0,.8);
   transition: background .04s;
 }
-/* glossy lacquer top surface */
 .key-b::after {
   content: '';
-  position: absolute; top: 2px; left: 2px; right: 3px;
-  height: 55%;
-  background: linear-gradient(180deg, rgba(255,255,255,.16) 0%, rgba(255,255,255,.05) 45%, transparent 100%);
-  border-radius: 1px 1px 4px 4px;
-  pointer-events: none;
-}
-/* angled front face at the bottom of the key */
-.key-b::before {
-  content: '';
-  position: absolute; left: 0; right: 0; bottom: 0;
-  height: 22%;
-  background: linear-gradient(180deg, rgba(90,88,76,.5) 0%, rgba(40,38,32,.85) 35%, rgba(8,8,6,.95) 100%);
-  border-radius: 0 0 3px 3px;
-  pointer-events: none;
+  position: absolute; top: 4px; left: 3px; right: 3px;
+  height: 30%; background: linear-gradient(180deg, rgba(255,255,255,.09), transparent);
+  border-radius: 2px; pointer-events: none;
 }
 .key-b:hover {
-  background:
-    linear-gradient(90deg, rgba(80,78,66,.55) 0%, rgba(0,0,0,0) 12%, rgba(0,0,0,0) 82%, rgba(0,0,0,.6) 100%),
-    linear-gradient(180deg, #3c3c32 0%, #2a2a22 45%, #1a1a14 78%, #101008 100%);
+  background: linear-gradient(180deg, #353528 0%, #252518 55%, #181810 100%);
 }
 .key-b.on {
-  background: linear-gradient(180deg, #b85c14 0%, #8c4408 50%, #622c04 100%) !important;
-  box-shadow:
-    inset 1px 0 1px rgba(255,200,120,.2),
-    inset -1px 0 3px rgba(0,0,0,.6),
-    1px 3px 5px rgba(0,0,0,.8);
+  background: linear-gradient(180deg, #c06018 0%, #904808 55%, #703005 100%) !important;
+  box-shadow: inset -1px 0 2px rgba(0,0,0,.6), 1px 2px 5px rgba(0,0,0,.8);
   transform: translateY(2px);
 }
 
@@ -597,16 +554,13 @@ body {
 <!-- Shared SVG gradients -->
 <svg id="svgDefs" aria-hidden="true">
   <defs>
-    <radialGradient id="kbody" cx="36%" cy="28%" r="72%">
-      <stop offset="0%"   stop-color="#5a5248"/>
-      <stop offset="35%"  stop-color="#403830"/>
-      <stop offset="75%"  stop-color="#262018"/>
-      <stop offset="100%" stop-color="#14100a"/>
+    <radialGradient id="kbody" cx="38%" cy="32%" r="62%">
+      <stop offset="0%"   stop-color="#484038"/>
+      <stop offset="100%" stop-color="#1c1810"/>
     </radialGradient>
-    <radialGradient id="kinner" cx="36%" cy="28%" r="72%">
-      <stop offset="0%"   stop-color="#443c32"/>
-      <stop offset="45%"  stop-color="#2e2820"/>
-      <stop offset="100%" stop-color="#100c06"/>
+    <radialGradient id="kinner" cx="38%" cy="32%" r="62%">
+      <stop offset="0%"   stop-color="#383028"/>
+      <stop offset="100%" stop-color="#141008"/>
     </radialGradient>
   </defs>
 </svg>
@@ -893,8 +847,8 @@ function buildWaveSelectors() {
       });
       btn.classList.add('active');
       btn.style.color = 'var(--ms-orange)';
-      if (id === 'wv1') { S.vco1Wave = btn.dataset.wave; for (const v of S.voices.values()) try { setOscWave(S.ctx, v.osc1, S.vco1Wave, S.params.vco1PW) } catch(e){} }
-      if (id === 'wv2') { S.vco2Wave = btn.dataset.wave; for (const v of S.voices.values()) { if (!v.isNoise && S.vco2Wave !== 'noise') try { setOscWave(S.ctx, v.osc2, S.vco2Wave, S.params.vco2PW) } catch(e){} } }
+      if (id === 'wv1') { S.vco1Wave = btn.dataset.wave; for (const v of S.voices.values()) try { v.osc1.type = S.vco1Wave } catch(e){} }
+      if (id === 'wv2') { S.vco2Wave = btn.dataset.wave; }
       if (id === 'wvL') { S.lfoWave  = btn.dataset.wave; if (S.lfoNode) S.lfoNode.type = S.lfoWave; }
     });
   }
@@ -1099,15 +1053,25 @@ function initAudio() {
   chorusMerge.connect(S.chorusMixGain);
 
   // ── Final routing ──
-  // voices → voiceBus → dry + FX sends → masterGain → limiter → destination
-  S.voiceBus = ctx.createGain();
-  S.voiceBus.gain.value = 1;
-  S.voiceBus.connect(S.dryGain);
-  S.voiceBus.connect(S.convolver);
-  S.voiceBus.connect(S.delayNode);
-  S.voiceBus.connect(S.chorusDelay1);
-  S.voiceBus.connect(S.chorusDelay2);
+  S.limiter.connect(S.dryGain);
+  S.limiter.connect(S.convolver);
+  S.limiter.connect(S.delayNode);
+  S.limiter.connect(S.chorusDelay1);
+  S.limiter.connect(S.chorusDelay2);
   S.convolver.connect(S.reverbGain);
+  [S.dryGain, S.reverbGain, S.delayMix, S.chorusMixGain].forEach(n => n.connect(S.masterGain));
+  S.masterGain.connect(S.limiter);  // intentional: master → limiter → destination
+  S.masterGain.disconnect(S.limiter);  // fix: limiter is output stage
+  // Correct output chain: voices → limiter → masterGain → destination
+  S.masterGain.connect(ctx.destination);
+  // Reconnect effects to masterGain instead
+  S.limiter.disconnect();
+  S.limiter.connect(ctx.destination);
+  // Rebuild: voices → masterGain → limiter → destination
+  S.masterGain.disconnect();
+  S.limiter.disconnect();
+  [S.dryGain, S.reverbGain, S.delayMix, S.chorusMixGain].forEach(n => { try{n.disconnect()}catch(e){} });
+  // Clean final chain:
   [S.dryGain, S.reverbGain, S.delayMix, S.chorusMixGain].forEach(n => n.connect(S.masterGain));
   S.masterGain.connect(S.limiter);
   S.limiter.connect(ctx.destination);
@@ -1135,14 +1099,8 @@ function buildIR(ctx) {
       const env = Math.pow(1 - i / len, 1.8);
       d[i] += (Math.random() * 2 - 1) * env * 0.12;
     }
-    // One-pole LP over the IR — darker, warmer tail (progressively duller)
-    let lp = 0;
-    for (let i = 0; i < len; i++) {
-      const a = 0.25 - 0.13 * (i / len);  // cutoff falls as tail decays
-      lp += a * (d[i] - lp);
-      d[i] = lp;
-    }
   }
+  // LP filter the IR for darker reverb character
   S.convolver.buffer = buf;
 }
 
@@ -1150,36 +1108,6 @@ function buildIR(ctx) {
 //  MIDI FREQUENCY + DETUNE HELPERS
 // ──────────────────────────────────────────────
 function midiFreq(n) { return 440 * Math.pow(2, (n - 69) / 12); }
-
-// ──────────────────────────────────────────────
-//  PULSE WAVE (variable duty cycle)
-//  Web Audio 'square' is fixed 50% — real PWM needs
-//  a Fourier-built PeriodicWave. Cached per duty step.
-// ──────────────────────────────────────────────
-const _pulseCache = new Map();
-function pulseWave(ctx, duty) {
-  const d = Math.max(0.05, Math.min(0.95, duty));
-  const key = Math.round(d * 100);
-  if (_pulseCache.has(key)) return _pulseCache.get(key);
-  const N = 64;
-  const real = new Float32Array(N);
-  const imag = new Float32Array(N);
-  for (let k = 1; k < N; k++) {
-    real[k] = (2 / (k * Math.PI)) * Math.sin(k * Math.PI * d);
-  }
-  const w = ctx.createPeriodicWave(real, imag);
-  _pulseCache.set(key, w);
-  return w;
-}
-
-// Apply wave type to an oscillator, honouring pulse width for squares
-function setOscWave(ctx, osc, wave, pw) {
-  if (wave === 'square' && Math.abs(pw - 0.5) > 0.01) {
-    osc.setPeriodicWave(pulseWave(ctx, pw));
-  } else {
-    osc.type = wave;
-  }
-}
 
 // Each voice gets a unique drift offset so unison voices wander independently
 let _voiceSeed = 0;
@@ -1204,7 +1132,7 @@ function buildVoice(ctx, midi, vel, freq, now) {
 
   // ── VCO 1 ──
   const osc1 = ctx.createOscillator();
-  setOscWave(ctx, osc1, S.vco1Wave, p.vco1PW);
+  osc1.type = S.vco1Wave;
   osc1.frequency.value = freq;
   osc1.detune.value = p.vco1Freq * 100 + p.vco1Fine + S.pitchBend * 200;
 
@@ -1218,7 +1146,7 @@ function buildVoice(ctx, midi, vel, freq, now) {
     osc2 = ctx.createBufferSource(); osc2.buffer = nb; osc2.loop = true;
   } else {
     osc2 = ctx.createOscillator();
-    setOscWave(ctx, osc2, S.vco2Wave, p.vco2PW);
+    osc2.type = S.vco2Wave;
     osc2.frequency.value = freq;
     osc2.detune.value = p.vco2Freq * 100 + p.vco2Fine + S.pitchBend * 200;
   }
@@ -1331,14 +1259,7 @@ function buildVoice(ctx, midi, vel, freq, now) {
   hpf2.connect(lpf1);
   lpf1.connect(resSat); resSat.connect(lpf2);
   lpf2.connect(postSat); postSat.connect(vca);
-  // Subtle per-voice stereo placement (analog voice-card spread)
-  const pan = ctx.createStereoPanner ? ctx.createStereoPanner() : null;
-  if (pan) {
-    pan.pan.value = (Math.random() * 2 - 1) * 0.12;
-    vca.connect(pan); pan.connect(S.voiceBus);
-  } else {
-    vca.connect(S.voiceBus);
-  }
+  vca.connect(S.masterGain);
 
   // ── LFO connections ──
   S.lfoGain.connect(osc1.detune);
@@ -1427,15 +1348,6 @@ function noteOff(midi, immediate = false) {
   try { v.osc1.stop(stop); v.osc2.stop(stop); } catch(e){}
   try { v.driftSrc.stop(stop); v.breathSrc.stop(stop); } catch(e){}
 
-  // Release global-LFO taps into this voice, otherwise they accumulate forever
-  v.osc1.onended = () => {
-    try { S.lfoGain.disconnect(v.osc1.detune); } catch(e){}
-    if (!v.isNoise) { try { S.lfoGain.disconnect(v.osc2.detune); } catch(e){} }
-    try { S.lfoFiltGain.disconnect(v.lpf1.frequency); } catch(e){}
-    try { S.lfoFiltGain.disconnect(v.lpf2.frequency); } catch(e){}
-    try { v.vca.disconnect(); } catch(e){}
-  };
-
   S.voices.delete(midi);
   const i = S.voiceList.indexOf(midi); if (i !== -1) S.voiceList.splice(i, 1);
   updateVoiceTxt();
@@ -1491,10 +1403,10 @@ function liveUpdate(param, val) {
         }
         break;
       }
-      case 'vco1PW': if (S.vco1Wave === 'square') setOscWave(ctx, v.osc1, 'square', val); break;
-      case 'vco2PW': if (!v.isNoise && S.vco2Wave === 'square') setOscWave(ctx, v.osc2, 'square', val); break;
     }
   }
+  // clear all visual highlights
+  document.querySelectorAll('.key-w.on, .key-b.on').forEach(k => k.classList.remove('on'));
 }
 
 
@@ -1534,47 +1446,9 @@ function normToParam(svg, norm) {
   return min + norm * (max - min);
 }
 
-// Adds knurled grip ticks + specular glare to a knob SVG for a machined look
-const SVG_NS = 'http://www.w3.org/2000/svg';
-function dressKnob(svg) {
-  const vb = svg.getAttribute('viewBox').split(' ');
-  const cx = parseFloat(vb[2]) / 2;
-  const cy = parseFloat(vb[3]) / 2;
-  const rOut = cx - 3;
-  const ind = document.getElementById(svg.dataset.id + '-ind');
-
-  // Knurled edge — alternating dark/light radial ticks
-  const knurl = document.createElementNS(SVG_NS, 'g');
-  const N = Math.max(20, Math.round(rOut * 1.8));
-  for (let i = 0; i < N; i++) {
-    const a = (i / N) * Math.PI * 2;
-    const l = document.createElementNS(SVG_NS, 'line');
-    l.setAttribute('x1', (cx + Math.cos(a) * (rOut - 1.4)).toFixed(2));
-    l.setAttribute('y1', (cy + Math.sin(a) * (rOut - 1.4)).toFixed(2));
-    l.setAttribute('x2', (cx + Math.cos(a) * (rOut + 0.6)).toFixed(2));
-    l.setAttribute('y2', (cy + Math.sin(a) * (rOut + 0.6)).toFixed(2));
-    l.setAttribute('stroke', i % 2 ? 'rgba(0,0,0,0.55)' : 'rgba(255,255,255,0.07)');
-    l.setAttribute('stroke-width', '0.9');
-    knurl.appendChild(l);
-  }
-  if (ind) svg.insertBefore(knurl, ind); else svg.appendChild(knurl);
-
-  // Specular glare — soft top-left reflection over the cap
-  const glare = document.createElementNS(SVG_NS, 'ellipse');
-  glare.setAttribute('cx', (cx - rOut * 0.32).toFixed(2));
-  glare.setAttribute('cy', (cy - rOut * 0.40).toFixed(2));
-  glare.setAttribute('rx', (rOut * 0.42).toFixed(2));
-  glare.setAttribute('ry', (rOut * 0.24).toFixed(2));
-  glare.setAttribute('transform', `rotate(-32 ${cx} ${cy})`);
-  glare.setAttribute('fill', 'rgba(255,252,240,0.10)');
-  glare.setAttribute('pointer-events', 'none');
-  svg.appendChild(glare);
-}
-
 function initKnobs() {
   document.querySelectorAll('.knob-svg').forEach(svg => {
     const param = svg.dataset.param; if (!param) return;
-    dressKnob(svg);
     const def = +svg.dataset.def;
     S.params[param] = DEFS[param] !== undefined ? DEFS[param] : def;
     setKnobVisual(svg, paramToNorm(svg, S.params[param]));
@@ -1751,18 +1625,14 @@ document.getElementById('btnOctUp').addEventListener('click', () => changeOct( 1
 */
 
 function createWheelCanvas(housing, isPitch) {
-  const W  = 46;   // canvas width (CSS px)
+  const W  = 46;   // canvas width
   const H  = 130;  // canvas height  (housing will fit to this)
-  const dpr = Math.min(2, window.devicePixelRatio || 1);
   const canvas = document.createElement('canvas');
-  canvas.width  = W * dpr;
-  canvas.height = H * dpr;
-  canvas.style.width  = W + 'px';
-  canvas.style.height = H + 'px';
+  canvas.width  = W;
+  canvas.height = H;
   housing.appendChild(canvas);
 
   const ctx   = canvas.getContext('2d');
-  ctx.scale(dpr, dpr);
   const R     = W * 0.92;          // cylinder radius (wider than canvas → sides clip)
   const cx    = W / 2;
   const cy    = H / 2;
@@ -1904,20 +1774,6 @@ function createWheelCanvas(housing, isPitch) {
   return { canvas, draw };
 }
 
-function applyPitchBend() {
-  if (!S.ctx) return;
-  const cents = S.pitchBend * 200;
-  for (const v of S.voices.values()) {
-    v.osc1.detune.setTargetAtTime(
-      S.params.vco1Freq*100 + S.params.vco1Fine + cents,
-      S.ctx.currentTime, .01);
-    if (!v.isNoise)
-      v.osc2.detune.setTargetAtTime(
-        S.params.vco2Freq*100 + S.params.vco2Fine + cents,
-        S.ctx.currentTime, .01);
-  }
-}
-
 function initWheels() {
   makeRotaryWheel({
     housingId: 'pitchHousing',
@@ -1926,7 +1782,17 @@ function initWheels() {
     springsBack: true,
     onChange: norm => {
       S.pitchBend = norm * 2 - 1;
-      applyPitchBend();
+      if (!S.ctx) return;
+      const cents = S.pitchBend * 200;
+      for (const v of S.voices.values()) {
+        v.osc1.detune.setTargetAtTime(
+          S.params.vco1Freq*100 + S.params.vco1Fine + cents,
+          S.ctx.currentTime, .01);
+        if (S.vco2Wave !== 'noise')
+          v.osc2.detune.setTargetAtTime(
+            S.params.vco2Freq*100 + S.params.vco2Fine + cents,
+            S.ctx.currentTime, .01);
+      }
     }
   });
 
@@ -2031,7 +1897,7 @@ function initMIDI() {
         const [st, d1, d2] = msg.data, cmd = st & 0xF0;
         if (cmd===0x90 && d2>0) { noteOn(d1, d2/127); highlight(d1, true); }
         else if (cmd===0x80 || (cmd===0x90 && d2===0)) { noteOff(d1); highlight(d1, false); }
-        else if (cmd===0xE0) { const b=((d2<<7)|d1)-8192; S.pitchBend=b/8192; applyPitchBend(); }
+        else if (cmd===0xE0) { const b=((d2<<7)|d1)-8192; S.pitchBend=b/8192; }
         else if (cmd===0xB0) {
           if (d1===1) { if(S.lfoFiltGain) S.lfoGain.gain.setTargetAtTime((S.params.lfoPitch+d2/127*.5)*100,S.ctx.currentTime,.01); }
           else if (d1===7) { const v=d2/127; liveUpdate('masterVol',v); const s=document.querySelector('[data-param="masterVol"]'); if(s){setKnobVisual(s,paramToNorm(s,v));} }
@@ -2215,7 +2081,6 @@ function captureState() {
 
 function applyState(st) {
   if (!st) return;
-  const octaveChanged = st.octave !== undefined && st.octave !== S.octave;
   Object.assign(S.params, st.params);
   S.vco1Wave = st.vco1Wave || 'sawtooth';
   S.vco2Wave = st.vco2Wave || 'square';
@@ -2228,9 +2093,7 @@ function applyState(st) {
       if (S.ctx) liveUpdate(p, S.params[p]);
     }
   });
-  if (S.ctx && S.lfoNode) S.lfoNode.type = S.lfoWave;
   document.getElementById('octDisp').textContent = `C${S.octave}`;
-  if (octaveChanged) { allNotesOff(); buildKeyboard(); }
   // update wave selectors
   ['wv1','wv2','wvL'].forEach(id => {
     const key  = id==='wv1'?'vco1Wave':id==='wv2'?'vco2Wave':'lfoWave';

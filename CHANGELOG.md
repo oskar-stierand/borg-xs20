@@ -4,6 +4,28 @@ Všechny změny jsou řazeny od nejnovějších. Formát vychází z [Keep a Cha
 
 ---
 
+## [5.0] — 2026-07-02
+
+### Opraveno
+- **FX routing** — reverb, delay a chorus byly úplně odpojené (série connect/disconnect v `initAudio()` odpojila jejich vstupy); nový čistý řetězec: voices → voiceBus → dry + FX sends → master → limiter
+- **Presety: překreslení klaviatury** — `applyState()` nyní při změně oktávy volá `buildKeyboard()`
+- **Presety: LFO waveform** — `applyState()` nyní propisuje `lfoWave` i do audio node
+- **Knoby mazaly stisknuté klávesy** — odstraněno bludné čištění highlightů v `liveUpdate()`
+- **MIDI pitch bend** — nyní se aplikuje na hrající hlasy (sdílený `applyPitchBend()` s kolečkem)
+- **Únik paměti LFO** — globální LFO tapy se po dohrání hlasu odpojují (`onended` cleanup)
+
+### Přidáno
+- **Skutečná pulzní šířka (PWM)** — P.WIDTH knoby generují Fourier PeriodicWave (cache per duty); funguje live i z presetů
+- **Stereo šířka hlasů** — subtle per-voice random pan ±0.12 (analog voice-card spread)
+- **Tmavší reverb** — one-pole lowpass přes IR s klesajícím cutoffem podél tailu
+
+### Změněno
+- **Klávesy** — realistická slonovina (vícestupňový gradient, boční bevely, přední hrana), černé klávesy s lakovaným leskem a šikmým čelem
+- **Knoby** — vroubkovaný úchop (knurl ticks), spekulární odlesk, hlubší kovové gradienty
+- **Pitch/Mod kolečka** — Retina 2× rendering
+
+---
+
 ## [4.1-bugfix] — 2026-03-04
 
 ### Opraveno
