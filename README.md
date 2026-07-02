@@ -2,7 +2,7 @@
 
 > Webový syntezátor inspirovaný legendárním Korg MS-20. Běží přímo v prohlížeči, podporuje MIDI klávesy, single-file HTML.
 
-![Version](https://img.shields.io/badge/version-5.3-orange)
+![Version](https://img.shields.io/badge/version-5.4-orange)
 ![License](https://img.shields.io/badge/license-MIT-green)
 ![Audio](https://img.shields.io/badge/Web%20Audio%20API-v2-blue)
 
@@ -14,7 +14,7 @@
 - **8-hlasá parafonie** se stealingem (FIFO) a portamentem
 - **Exponenciální ADSR** obálky (EG1 → filtr, EG2 → amplituda) — vertikální fadery s ivory capy
 - **Efekty** — reverb (IR convolution), tape delay, bucket-brigade chorus
-- **LFO** s modulací pitch a filtru
+- **LFO** s modulací pitch a filtru — routing přes **patch kabely** (verlet fyzika, normalling à la MS-20)
 - **MIDI podpora** — Note On/Off s velocity, Pitch Bend, CC1 (Mod Wheel), CC7 (Volume), hot-plug
 - **8 factory presetů** — CHILDREN, FUGA 1497, DREAMLAND, OXYGENE, EQUINOXE, HYPNOTIQUE, ACID SEQUENCE, PAD ATMOSPHERIQUE
 - **Pitch kolo** se spring-back, **Mod kolo** perzistentní
@@ -92,6 +92,7 @@ Viz [CHANGELOG.md](./CHANGELOG.md)
 Tasky jsou vedeny ve složce [`tasks/`](./tasks/) — jeden soubor na task (`kos-{číslo}.md`).
 
 - [ ] [KOS-16](./tasks/kos-16.md) — Arpeggiator (mode, rate, octaves, hold)
+- [x] [KOS-17](./tasks/kos-17.md) — Patch kabely MVP (LFO→filter/pitch, verlet fyzika) — *v5.4*
 - [x] [KOS-15](./tasks/kos-15.md) — ADSR: vertikální fadery — *v5.3*
 - [x] [KOS-14](./tasks/kos-14.md) — Dřevěné boky: bahenní dub — *v5.2*
 - [x] [KOS-13](./tasks/kos-13.md) — Pitch/Mod kola: realistický vizuál — *v5.1*

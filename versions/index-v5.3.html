@@ -317,40 +317,6 @@ body {
     inset 0 -2px 3px rgba(120,100,60,.35);
 }
 
-/* ── PATCH JACKS & CABLES (KOS-17) ───────────── */
-.jack {
-  width: 18px; height: 18px; border-radius: 50%;
-  background: radial-gradient(circle at 35% 30%, #8a8a80, #55554d 45%, #2a2a24 72%);
-  box-shadow:
-    0 1px 2px rgba(0,0,0,.8),
-    inset 0 1px 1px rgba(255,255,255,.25);
-  position: relative;
-  cursor: grab;
-  touch-action: none;
-}
-.jack::after {          /* the hole */
-  content: '';
-  position: absolute; inset: 5px; border-radius: 50%;
-  background: radial-gradient(circle at 40% 35%, #1c1c18, #000);
-  box-shadow: inset 0 1px 2px rgba(0,0,0,.95);
-}
-.jack.hot {             /* highlighted drop target */
-  box-shadow:
-    0 0 10px rgba(240,120,32,.85),
-    0 1px 2px rgba(0,0,0,.8),
-    inset 0 1px 1px rgba(255,255,255,.25);
-}
-.jack-lbl {
-  font-size: 6.5px; color: #777; letter-spacing: 1px;
-  font-family: 'Share Tech Mono', monospace;
-  text-transform: uppercase; text-align: center;
-}
-#patchCanvas {
-  position: fixed; inset: 0;
-  pointer-events: none;
-  z-index: 60;
-}
-
 /* ── WAVE SELECTOR ────────────────────────────── */
 .wave-row {
   display: flex; gap: 3px; justify-content: center;
@@ -767,10 +733,6 @@ body {
           <svg class="knob-svg" data-id="v1lv" data-param="vco1Level" data-min="0" data-max="1" data-def="0.8" data-val="0.8" width="34" height="34" viewBox="0 0 34 34"><circle cx="17" cy="17" r="14" fill="url(#kbody)" stroke="#585850" stroke-width="1.5"/><circle cx="17" cy="17" r="11" fill="url(#kinner)" stroke="#383028" stroke-width="1"/><circle cx="17" cy="17" r="5" fill="#181410"/><line id="v1lv-ind" x1="17" y1="17" x2="17" y2="5" stroke="#f07820" stroke-width="2" stroke-linecap="round"/></svg>
           <div class="knob-label">LEVEL</div>
         </div>
-        <div class="knob-group">
-          <div class="jack" id="jackPitchIn" data-jack="pitch"></div>
-          <div class="jack-lbl">PITCH 1+2</div>
-        </div>
       </div>
     </div>
 
@@ -818,10 +780,6 @@ body {
           <svg class="knob-svg" data-id="fea" data-param="filterEnvAmt" data-min="-1" data-max="1" data-def="0.3" data-val="0.3" width="44" height="44" viewBox="0 0 44 44"><circle cx="22" cy="22" r="19" fill="url(#kbody)" stroke="#585850" stroke-width="1.5"/><circle cx="22" cy="22" r="15" fill="url(#kinner)" stroke="#383028" stroke-width="1"/><circle cx="22" cy="22" r="7" fill="#181410"/><line id="fea-ind" x1="22" y1="22" x2="22" y2="7" stroke="#d8a820" stroke-width="2.5" stroke-linecap="round"/></svg>
           <div class="knob-label">ENV AMT</div>
         </div>
-        <div class="knob-group">
-          <div class="jack" id="jackFilterIn" data-jack="filter"></div>
-          <div class="jack-lbl">FILTER IN</div>
-        </div>
       </div>
     </div>
 
@@ -867,10 +825,6 @@ body {
         <div class="knob-group">
           <svg class="knob-svg" data-id="lff" data-param="lfoFilter" data-min="0" data-max="1" data-def="0" data-val="0" width="32" height="32" viewBox="0 0 32 32"><circle cx="16" cy="16" r="13" fill="url(#kbody)" stroke="#585850" stroke-width="1.5"/><circle cx="16" cy="16" r="10" fill="url(#kinner)"/><circle cx="16" cy="16" r="5" fill="#181410"/><line id="lff-ind" x1="16" y1="16" x2="16" y2="5" stroke="#30b040" stroke-width="2" stroke-linecap="round"/></svg>
           <div class="knob-label">→FILTER</div>
-        </div>
-        <div class="knob-group">
-          <div class="jack" id="jackMgOut" data-jack="mgout"></div>
-          <div class="jack-lbl">LFO OUT</div>
         </div>
       </div>
       <div style="width:100%;height:1px;background:#303028;margin:4px 0 6px;"></div>
@@ -954,9 +908,6 @@ body {
 
 </div><!-- /chassis -->
   <canvas class="wood-panel wood-right" id="woodRight"></canvas>
-
-  <!-- patch cable overlay (fixed, full window) -->
-  <canvas id="patchCanvas"></canvas>
 </div><!-- /synth-frame -->
 
 <!-- Toast -->
@@ -1058,7 +1009,6 @@ const S = {
   // audio nodes
   ctx: null,
   lfoNode:null, lfoGain:null, lfoFiltGain:null,
-  patched: { pitch: true, filter: true },  // patch cables (KOS-17): normalled = plugged at boot
   convolver:null, reverbGain:null, dryGain:null,
   delayNode:null, delayFb:null, delayMix:null,
   chorusDelay:null, chorusMix:null,
@@ -1186,9 +1136,9 @@ function initAudio() {
   S.lfoNode.frequency.value = S.params.lfoRate;
   S.lfoNode.start();
   S.lfoGain = ctx.createGain();
-  S.lfoGain.gain.value = S.params.lfoPitch * 100 * (S.patched.pitch ? 1 : 0);
+  S.lfoGain.gain.value = S.params.lfoPitch * 100;
   S.lfoFiltGain = ctx.createGain();
-  S.lfoFiltGain.gain.value = S.params.lfoFilter * 2000 * (S.patched.filter ? 1 : 0);
+  S.lfoFiltGain.gain.value = S.params.lfoFilter * 2000;
   S.lfoNode.connect(S.lfoGain);
   S.lfoNode.connect(S.lfoFiltGain);
 
@@ -1580,8 +1530,8 @@ function liveUpdate(param, val) {
   switch(param) {
     case 'masterVol':  S.masterGain.gain.setTargetAtTime(val, now, 0.01); break;
     case 'lfoRate':    S.lfoNode.frequency.setTargetAtTime(val, now, 0.05); break;
-    case 'lfoPitch':   S.lfoGain.gain.setTargetAtTime(val * 100 * (S.patched.pitch ? 1 : 0), now, 0.05); break;
-    case 'lfoFilter':  S.lfoFiltGain.gain.setTargetAtTime(val * 2000 * (S.patched.filter ? 1 : 0), now, 0.05); break;
+    case 'lfoPitch':   S.lfoGain.gain.setTargetAtTime(val * 100, now, 0.05); break;
+    case 'lfoFilter':  S.lfoFiltGain.gain.setTargetAtTime(val * 2000, now, 0.05); break;
     case 'reverbMix':  S.reverbGain.gain.setTargetAtTime(val, now, 0.05); break;
     case 'delayMix':   S.delayMix.gain.setTargetAtTime(val, now, 0.05); break;
     case 'chorusMix':  if(S.chorusMixGain) S.chorusMixGain.gain.setTargetAtTime(val, now, 0.05); break;
@@ -1797,301 +1747,6 @@ function initFaders() {
       setFaderVisual(fd, paramToNorm(fd, def));
       liveUpdate(param, def);
     });
-  });
-}
-
-// ═══════════════════════════════════════════════
-//  PATCH CABLES  (KOS-17 — MG OUT → FILTER / PITCH)
-// ═══════════════════════════════════════════════
-/*
-  Semi-modular normalling: the two LFO mod routes only sound
-  while a cable is plugged in (S.patched.*); the →PITCH and
-  →FILTER knobs act as attenuators. Cables are verlet ropes
-  (gravity, damping, pinned ends) drawn on a fixed full-window
-  canvas overlay — they sag, swing and settle like real rubber
-  cables (Reason-style).
-*/
-
-function updatePatchRouting() {
-  if (!S.ctx) return;
-  const now = S.ctx.currentTime;
-  S.lfoGain.gain.setTargetAtTime(S.params.lfoPitch * 100 * (S.patched.pitch ? 1 : 0), now, 0.03);
-  S.lfoFiltGain.gain.setTargetAtTime(S.params.lfoFilter * 2000 * (S.patched.filter ? 1 : 0), now, 0.03);
-}
-
-function initPatchbay() {
-  const canvas = document.getElementById('patchCanvas');
-  const pctx   = canvas.getContext('2d');
-  const jacks  = {
-    mgout:  document.getElementById('jackMgOut'),
-    pitch:  document.getElementById('jackPitchIn'),
-    filter: document.getElementById('jackFilterIn'),
-  };
-  const PALETTE = ['#b03830', '#c09028', '#3a5a9a'];
-  const N    = 14;     // rope points
-  const SNAP = 28;     // px — magnetic radius around a jack
-  const DROP = 0.45;   // s — fall & fade time of a dropped cable
-
-  const resize = () => {
-    const dpr = Math.min(2, window.devicePixelRatio || 1);
-    canvas.width  = innerWidth  * dpr;
-    canvas.height = innerHeight * dpr;
-    canvas.style.width  = innerWidth  + 'px';
-    canvas.style.height = innerHeight + 'px';
-    pctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-  };
-  resize();
-  window.addEventListener('resize', resize);
-
-  const jackPos = id => {
-    const r = jacks[id].getBoundingClientRect();
-    return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
-  };
-
-  // cable: { from: 'mgout'|null, to: 'pitch'|'filter'|null, color, pts, dead }
-  // a null end follows the mouse while the cable is being dragged
-  const cables = [];
-  const mouse  = { x: 0, y: 0 };
-  let dragging = null;
-  let paletteIdx = 0;
-
-  const makeRope = (a, b) => {
-    const pts = [];
-    for (let i = 0; i < N; i++) {
-      const t = i / (N - 1);
-      const x = a.x + (b.x - a.x) * t;
-      const y = a.y + (b.y - a.y) * t + Math.sin(t * Math.PI) * 26;
-      pts.push({ x, y, px: x, py: y });
-    }
-    return pts;
-  };
-
-  const addCable = dest => {
-    cables.push({
-      from: 'mgout',
-      to: dest,
-      color: PALETTE[(paletteIdx++) % PALETTE.length],
-      pts: makeRope(jackPos('mgout'), jackPos(dest)),
-      dead: 0,
-    });
-  };
-
-  // Rebuild cables to match S.patched (boot & preset load)
-  window.syncPatchCables = () => {
-    dragging = null;
-    cables.length = 0;
-    if (S.patched.filter) addCable('filter');
-    if (S.patched.pitch)  addCable('pitch');
-  };
-  requestAnimationFrame(() => syncPatchCables());
-
-  // ── physics ──────────────────────────────────
-  const step = dt => {
-    for (const c of cables) {
-      const pts = c.pts;
-      for (const p of pts) {
-        const vx = (p.x - p.px) * 0.955;
-        const vy = (p.y - p.py) * 0.955;
-        p.px = p.x; p.py = p.y;
-        p.x += vx;
-        p.y += vy + 1600 * dt * dt;   // gravity
-      }
-      let a = null, b = null;
-      if (!c.dead) {
-        a = c.from ? jackPos('mgout') : mouse;
-        b = c.to   ? jackPos(c.to)    : mouse;
-      }
-      const e0 = a || pts[0], e1 = b || pts[N - 1];
-      const segLen = (Math.hypot(e1.x - e0.x, e1.y - e0.y) * 1.1 + 42) / (N - 1);
-      for (let iter = 0; iter < 3; iter++) {
-        if (a) { pts[0].x = a.x; pts[0].y = a.y; }
-        if (b) { pts[N-1].x = b.x; pts[N-1].y = b.y; }
-        for (let i = 0; i < N - 1; i++) {
-          const p1 = pts[i], p2 = pts[i + 1];
-          let dx = p2.x - p1.x, dy = p2.y - p1.y;
-          const d = Math.hypot(dx, dy) || 0.0001;
-          const f = (d - segLen) / d * 0.5;
-          dx *= f; dy *= f;
-          if (i > 0 || !a)         { p1.x += dx; p1.y += dy; }
-          if (i < N - 2 || !b)     { p2.x -= dx; p2.y -= dy; }
-        }
-      }
-      if (a) { pts[0].x = a.x; pts[0].y = a.y; }
-      if (b) { pts[N-1].x = b.x; pts[N-1].y = b.y; }
-      if (c.dead) c.dead += dt;
-    }
-    for (let i = cables.length - 1; i >= 0; i--)
-      if (cables[i].dead > DROP) cables.splice(i, 1);
-  };
-
-  // ── rendering ────────────────────────────────
-  const drawPlug = (p, q, color) => {
-    const ang = Math.atan2(p.y - q.y, p.x - q.x);
-    pctx.save();
-    pctx.translate(p.x, p.y); pctx.rotate(ang);
-    pctx.fillStyle = color;                    // coloured boot
-    pctx.fillRect(-14, -3.4, 9, 6.8);
-    const met = pctx.createLinearGradient(0, -3, 0, 3);
-    met.addColorStop(0, '#c8c8c0'); met.addColorStop(.5, '#88887e'); met.addColorStop(1, '#3a3a34');
-    pctx.fillStyle = met;                      // metal shaft into the jack
-    pctx.fillRect(-6, -2.6, 10, 5.2);
-    pctx.restore();
-  };
-
-  const strokeRope = (pts, off, style, width) => {
-    pctx.beginPath();
-    pctx.moveTo(pts[0].x, pts[0].y + off);
-    for (let i = 1; i < N - 1; i++) {
-      const mx = (pts[i].x + pts[i + 1].x) / 2;
-      const my = (pts[i].y + pts[i + 1].y) / 2 + off;
-      pctx.quadraticCurveTo(pts[i].x, pts[i].y + off, mx, my);
-    }
-    pctx.lineTo(pts[N-1].x, pts[N-1].y + off);
-    pctx.strokeStyle = style; pctx.lineWidth = width; pctx.stroke();
-  };
-
-  const draw = () => {
-    pctx.clearRect(0, 0, innerWidth, innerHeight);
-    pctx.lineCap = 'round'; pctx.lineJoin = 'round';
-    for (const c of cables) {
-      pctx.save();
-      if (c.dead) pctx.globalAlpha = Math.max(0, 1 - c.dead / DROP);
-      strokeRope(c.pts, 5, 'rgba(0,0,0,.35)', 5);            // cast shadow
-      strokeRope(c.pts, 0, c.color, 4);                       // rubber body
-      strokeRope(c.pts, -1, 'rgba(255,255,255,.22)', 1.1);    // sheen
-      drawPlug(c.pts[0],   c.pts[1],     c.color);
-      drawPlug(c.pts[N-1], c.pts[N-2],   c.color);
-      pctx.restore();
-    }
-  };
-
-  let last = performance.now();
-  const loop = t => {
-    const dt = Math.min(0.033, (t - last) / 1000); last = t;
-    if (cables.length) { step(dt / 2); step(dt / 2); draw(); }
-    else pctx.clearRect(0, 0, innerWidth, innerHeight);
-    requestAnimationFrame(loop);
-  };
-  requestAnimationFrame(loop);
-
-  // ── interaction ──────────────────────────────
-  const getXY = e => e.touches
-    ? { x: e.touches[0].clientX, y: e.touches[0].clientY }
-    : { x: e.clientX, y: e.clientY };
-
-  const nearestFreeDest = () => {
-    let best = null, bd = SNAP;
-    for (const id of ['pitch', 'filter']) {
-      if (S.patched[id]) continue;          // occupied
-      const p = jackPos(id);
-      const d = Math.hypot(mouse.x - p.x, mouse.y - p.y);
-      if (d < bd) { bd = d; best = id; }
-    }
-    return best;
-  };
-
-  const nearMgOut = () => {
-    const p = jackPos('mgout');
-    return Math.hypot(mouse.x - p.x, mouse.y - p.y) < SNAP;
-  };
-
-  const onMove = e => {
-    const p = getXY(e); mouse.x = p.x; mouse.y = p.y;
-    if (!dragging) return;
-    e.preventDefault();
-    if (!dragging.to) {          // free end seeks a destination
-      const near = nearestFreeDest();
-      for (const id of ['pitch', 'filter'])
-        jacks[id].classList.toggle('hot', near === id);
-    } else {                     // free end seeks the source
-      jacks.mgout.classList.toggle('hot', nearMgOut());
-    }
-  };
-
-  const onUp = () => {
-    document.removeEventListener('mousemove', onMove);
-    document.removeEventListener('touchmove', onMove);
-    document.removeEventListener('mouseup', onUp);
-    document.removeEventListener('touchend', onUp);
-    if (!dragging) return;
-    for (const id of ['pitch', 'filter', 'mgout']) jacks[id].classList.remove('hot');
-    let connected = false;
-    if (!dragging.to) {
-      const near = nearestFreeDest();
-      if (near) { dragging.to = near; connected = true; }
-    } else if (nearMgOut()) {
-      dragging.from = 'mgout'; connected = true;
-    }
-    if (connected) {
-      S.patched[dragging.to] = true;
-      updatePatchRouting();
-      // Plugging in should be audible: if the attenuator knob
-      // (→PITCH / →FILTER) sits at zero, raise it to a modest
-      // default, knob visual included. Unplugging leaves it alone.
-      const attParam = dragging.to === 'pitch' ? 'lfoPitch' : 'lfoFilter';
-      if (S.params[attParam] === 0) {
-        const attVal = dragging.to === 'pitch' ? 0.15 : 0.35;
-        const knob = document.querySelector(`[data-param="${attParam}"]`);
-        if (knob) setKnobVisual(knob, paramToNorm(knob, attVal));
-        liveUpdate(attParam, attVal);
-      }
-    } else {
-      dragging.dead = 0.0001;               // falls & fades out
-    }
-    dragging = null;
-  };
-
-  const bindDrag = e => {
-    const p = getXY(e); mouse.x = p.x; mouse.y = p.y;
-    document.addEventListener('mousemove', onMove);
-    document.addEventListener('touchmove', onMove, { passive: false });
-    document.addEventListener('mouseup', onUp);
-    document.addEventListener('touchend', onUp);
-  };
-
-  const startFromSource = e => {
-    e.preventDefault(); initAudio();
-    bindDrag(e);
-    const c = {
-      from: 'mgout',
-      to: null,
-      color: PALETTE[(paletteIdx++) % PALETTE.length],
-      pts: makeRope(jackPos('mgout'), mouse),
-      dead: 0,
-    };
-    cables.push(c);
-    dragging = c;
-  };
-  jacks.mgout.addEventListener('mousedown', startFromSource);
-  jacks.mgout.addEventListener('touchstart', startFromSource, { passive: false });
-
-  ['pitch', 'filter'].forEach(id => {
-    const grab = e => {
-      e.preventDefault(); initAudio();
-      bindDrag(e);
-      if (S.patched[id]) {
-        // unplug the existing cable — its free end follows the mouse
-        const c = cables.find(c => c.to === id && !c.dead);
-        if (!c) return;
-        c.to = null;
-        S.patched[id] = false;
-        updatePatchRouting();
-        dragging = c;
-      } else {
-        // start a new cable anchored here, seeking MG OUT
-        const c = {
-          from: null,
-          to: id,
-          color: PALETTE[(paletteIdx++) % PALETTE.length],
-          pts: makeRope(mouse, jackPos(id)),
-          dead: 0,
-        };
-        cables.push(c);
-        dragging = c;
-      }
-    };
-    jacks[id].addEventListener('mousedown', grab);
-    jacks[id].addEventListener('touchstart', grab, { passive: false });
   });
 }
 
@@ -2425,7 +2080,7 @@ function initWheels() {
     onChange: norm => {
       if (!S.ctx) return;
       S.lfoGain.gain.setTargetAtTime(
-        (S.params.lfoPitch + norm * 0.5) * 100 * (S.patched.pitch ? 1 : 0),
+        (S.params.lfoPitch + norm * 0.5) * 100,
         S.ctx.currentTime, .01);
     }
   });
@@ -2520,7 +2175,7 @@ function initMIDI() {
         else if (cmd===0x80 || (cmd===0x90 && d2===0)) { noteOff(d1); highlight(d1, false); }
         else if (cmd===0xE0) { const b=((d2<<7)|d1)-8192; S.pitchBend=b/8192; applyPitchBend(); }
         else if (cmd===0xB0) {
-          if (d1===1) { if(S.lfoFiltGain) S.lfoGain.gain.setTargetAtTime((S.params.lfoPitch+d2/127*.5)*100*(S.patched.pitch?1:0),S.ctx.currentTime,.01); }
+          if (d1===1) { if(S.lfoFiltGain) S.lfoGain.gain.setTargetAtTime((S.params.lfoPitch+d2/127*.5)*100,S.ctx.currentTime,.01); }
           else if (d1===7) { const v=d2/127; liveUpdate('masterVol',v); const s=document.querySelector('[data-param="masterVol"]'); if(s){setKnobVisual(s,paramToNorm(s,v));} }
           else if (d1===123||d1===120) allNotesOff();
         }
@@ -2697,7 +2352,7 @@ function buildPresetBank() {
 }
 
 function captureState() {
-  return { params:{...S.params}, vco1Wave:S.vco1Wave, vco2Wave:S.vco2Wave, lfoWave:S.lfoWave, octave:S.octave, patched:{...S.patched} };
+  return { params:{...S.params}, vco1Wave:S.vco1Wave, vco2Wave:S.vco2Wave, lfoWave:S.lfoWave, octave:S.octave };
 }
 
 function applyState(st) {
@@ -2708,13 +2363,6 @@ function applyState(st) {
   S.vco2Wave = st.vco2Wave || 'square';
   S.lfoWave  = st.lfoWave  || 'sine';
   if (st.octave!==undefined) S.octave = st.octave;
-  // patch cables — old presets without the field mean "plugged" (normalled)
-  S.patched = {
-    pitch:  !(st.patched && st.patched.pitch  === false),
-    filter: !(st.patched && st.patched.filter === false),
-  };
-  if (window.syncPatchCables) syncPatchCables();
-  if (S.ctx) updatePatchRouting();
   document.querySelectorAll('.knob-svg').forEach(s => {
     const p = s.dataset.param;
     if (p && S.params[p]!==undefined) {
@@ -3055,7 +2703,6 @@ document.addEventListener('DOMContentLoaded', () => {
   buildWaveSelectors();
   initKnobs();
   initFaders();
-  initPatchbay();
   buildKeyboard();
   buildPresetBank();
   initWheels();

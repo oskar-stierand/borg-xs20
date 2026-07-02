@@ -4,6 +4,15 @@ Všechny změny jsou řazeny od nejnovějších. Formát vychází z [Keep a Cha
 
 ---
 
+## [5.4] — 2026-07-02
+
+### Přidáno
+- **Patch kabely (KOS-17)** — první semi-modulární propojky: jacky LFO OUT, PITCH 1+2 (moduluje oba VCO) a FILTER IN; verlet fyzika kabelů (gravitace, průvěs, houpání, dokmitávání), tažení z libovolného konce (OUT→IN i IN→OUT), magnetický přítah + zvýraznění cílového jacku, upuštěný kabel spadne a rozplyne se
+- **Normalling** — modulační cesty LFO→pitch/filter hrají jen se zapojeným kabelem; knoby →PITCH/→FILTER fungují jako attenuatory; boot má oba kabely zapojené (zachování dosavadního chování); stav kabelů se ukládá do presetů
+- **Auto-slyšitelnost** — zapojení kabelu s attenuatorem na nule ho zvedne na slyšitelnou hodnotu (→FILTER 0.35, →PITCH 0.15) včetně vizuálu knobu
+
+---
+
 ## [5.3] — 2026-07-02
 
 ### Změněno
