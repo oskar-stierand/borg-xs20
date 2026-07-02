@@ -240,83 +240,6 @@ body {
   align-items: flex-end; flex-wrap: wrap; gap: 6px;
 }
 
-/* ── ADSR FADERS (EG panel) ──────────────────── */
-.fader-group {
-  display: flex; flex-direction: column;
-  align-items: center; gap: 3px;
-}
-.fader {
-  --accent: #f07820;              /* EG1 orange */
-  position: relative;
-  width: 20px; height: 64px;
-  cursor: ns-resize;
-  touch-action: none;
-  user-select: none;
-}
-.fader.eg2 { --accent: #d8a820; } /* EG2 amber */
-
-/* recessed slot (machined slit in the panel) */
-.fader-slot {
-  position: absolute; left: 50%; top: 2px; bottom: 2px;
-  width: 5px; transform: translateX(-50%);
-  background: linear-gradient(180deg, #0a0908, #16130f 30%, #16130f 70%, #0a0908);
-  border-radius: 3px;
-  box-shadow:
-    inset 0 1px 3px rgba(0,0,0,.9),
-    inset 0 -1px 1px rgba(0,0,0,.6),
-    0 1px 0 rgba(255,255,255,.05);
-  overflow: hidden;
-}
-/* value fill below the cap */
-.fader-fill {
-  position: absolute; left: 0; right: 0; bottom: 0;
-  height: 0%;
-  background: var(--accent);
-  opacity: .5;
-  box-shadow: 0 0 6px var(--accent);
-}
-/* side tick marks */
-.fader::before, .fader::after {
-  content: '';
-  position: absolute; top: 4px; bottom: 4px;
-  width: 3px;
-  background: repeating-linear-gradient(180deg,
-    rgba(255,255,255,.13) 0 1px, transparent 1px 11.2px);
-  pointer-events: none;
-}
-.fader::before { left: 0; }
-.fader::after  { right: 0; }
-
-/* ivory cap — matches the keyboard ivories */
-.fader-cap {
-  position: absolute; left: 50%; transform: translateX(-50%);
-  bottom: 2px;                    /* positioned by JS */
-  width: 18px; height: 13px;
-  border-radius: 3px;
-  background: linear-gradient(180deg,
-    #fffef8 0%, #f7f2e2 35%, #e8e0c8 60%, #d8cead 100%);
-  box-shadow:
-    0 2px 4px rgba(0,0,0,.75),
-    inset 0 1px 0 rgba(255,255,255,.9),
-    inset 0 -2px 3px rgba(120,100,60,.35);
-  pointer-events: none;
-}
-/* grip groove across the cap */
-.fader-cap::after {
-  content: '';
-  position: absolute; left: 3px; right: 3px; top: 50%;
-  height: 2px; transform: translateY(-50%);
-  background: linear-gradient(180deg, rgba(90,75,45,.55), rgba(255,255,255,.5));
-  border-radius: 1px;
-}
-.fader:hover .fader-cap {
-  box-shadow:
-    0 2px 6px rgba(0,0,0,.8),
-    0 0 8px rgba(240,120,32,.35),
-    inset 0 1px 0 rgba(255,255,255,.9),
-    inset 0 -2px 3px rgba(120,100,60,.35);
-}
-
 /* ── WAVE SELECTOR ────────────────────────────── */
 .wave-row {
   display: flex; gap: 3px; justify-content: center;
@@ -790,20 +713,20 @@ body {
         <div style="flex:1;">
           <div class="sub-label">EG1 FILTER</div>
           <div class="knob-row">
-            <div class="fader-group"><div class="fader eg1" data-id="e1a" data-param="eg1Attack"  data-min="0.001" data-max="3" data-def="0.01" data-val="0.01" data-scale="log"><div class="fader-slot"><div class="fader-fill" id="e1a-fill"></div></div><div class="fader-cap" id="e1a-cap"></div></div><div class="knob-label">A</div></div>
-            <div class="fader-group"><div class="fader eg1" data-id="e1d" data-param="eg1Decay"   data-min="0.01" data-max="3" data-def="0.3" data-val="0.3" data-scale="log"><div class="fader-slot"><div class="fader-fill" id="e1d-fill"></div></div><div class="fader-cap" id="e1d-cap"></div></div><div class="knob-label">D</div></div>
-            <div class="fader-group"><div class="fader eg1" data-id="e1s" data-param="eg1Sustain" data-min="0" data-max="1" data-def="0.5" data-val="0.5"><div class="fader-slot"><div class="fader-fill" id="e1s-fill"></div></div><div class="fader-cap" id="e1s-cap"></div></div><div class="knob-label">S</div></div>
-            <div class="fader-group"><div class="fader eg1" data-id="e1r" data-param="eg1Release" data-min="0.01" data-max="5" data-def="0.5" data-val="0.5" data-scale="log"><div class="fader-slot"><div class="fader-fill" id="e1r-fill"></div></div><div class="fader-cap" id="e1r-cap"></div></div><div class="knob-label">R</div></div>
+            <div class="knob-group"><svg class="knob-svg" data-id="e1a" data-param="eg1Attack"  data-min="0.001" data-max="3" data-def="0.01" data-val="0.01" data-scale="log" width="32" height="32" viewBox="0 0 32 32"><circle cx="16" cy="16" r="13" fill="url(#kbody)" stroke="#585850" stroke-width="1.5"/><circle cx="16" cy="16" r="10" fill="url(#kinner)"/><circle cx="16" cy="16" r="5" fill="#181410"/><line id="e1a-ind" x1="16" y1="16" x2="16" y2="5" stroke="#f07820" stroke-width="2" stroke-linecap="round"/></svg><div class="knob-label">A</div></div>
+            <div class="knob-group"><svg class="knob-svg" data-id="e1d" data-param="eg1Decay"   data-min="0.01" data-max="3" data-def="0.3" data-val="0.3" data-scale="log" width="32" height="32" viewBox="0 0 32 32"><circle cx="16" cy="16" r="13" fill="url(#kbody)" stroke="#585850" stroke-width="1.5"/><circle cx="16" cy="16" r="10" fill="url(#kinner)"/><circle cx="16" cy="16" r="5" fill="#181410"/><line id="e1d-ind" x1="16" y1="16" x2="16" y2="5" stroke="#f07820" stroke-width="2" stroke-linecap="round"/></svg><div class="knob-label">D</div></div>
+            <div class="knob-group"><svg class="knob-svg" data-id="e1s" data-param="eg1Sustain" data-min="0" data-max="1" data-def="0.5" data-val="0.5" width="32" height="32" viewBox="0 0 32 32"><circle cx="16" cy="16" r="13" fill="url(#kbody)" stroke="#585850" stroke-width="1.5"/><circle cx="16" cy="16" r="10" fill="url(#kinner)"/><circle cx="16" cy="16" r="5" fill="#181410"/><line id="e1s-ind" x1="16" y1="16" x2="16" y2="5" stroke="#f07820" stroke-width="2" stroke-linecap="round"/></svg><div class="knob-label">S</div></div>
+            <div class="knob-group"><svg class="knob-svg" data-id="e1r" data-param="eg1Release" data-min="0.01" data-max="5" data-def="0.5" data-val="0.5" data-scale="log" width="32" height="32" viewBox="0 0 32 32"><circle cx="16" cy="16" r="13" fill="url(#kbody)" stroke="#585850" stroke-width="1.5"/><circle cx="16" cy="16" r="10" fill="url(#kinner)"/><circle cx="16" cy="16" r="5" fill="#181410"/><line id="e1r-ind" x1="16" y1="16" x2="16" y2="5" stroke="#f07820" stroke-width="2" stroke-linecap="round"/></svg><div class="knob-label">R</div></div>
           </div>
         </div>
         <div style="width:1px;background:#303028;"></div>
         <div style="flex:1;">
           <div class="sub-label">EG2 AMP</div>
           <div class="knob-row">
-            <div class="fader-group"><div class="fader eg2" data-id="e2a" data-param="eg2Attack"  data-min="0.001" data-max="3" data-def="0.005" data-val="0.005" data-scale="log"><div class="fader-slot"><div class="fader-fill" id="e2a-fill"></div></div><div class="fader-cap" id="e2a-cap"></div></div><div class="knob-label">A</div></div>
-            <div class="fader-group"><div class="fader eg2" data-id="e2d" data-param="eg2Decay"   data-min="0.01" data-max="3" data-def="0.2" data-val="0.2" data-scale="log"><div class="fader-slot"><div class="fader-fill" id="e2d-fill"></div></div><div class="fader-cap" id="e2d-cap"></div></div><div class="knob-label">D</div></div>
-            <div class="fader-group"><div class="fader eg2" data-id="e2s" data-param="eg2Sustain" data-min="0" data-max="1" data-def="0.7" data-val="0.7"><div class="fader-slot"><div class="fader-fill" id="e2s-fill"></div></div><div class="fader-cap" id="e2s-cap"></div></div><div class="knob-label">S</div></div>
-            <div class="fader-group"><div class="fader eg2" data-id="e2r" data-param="eg2Release" data-min="0.01" data-max="5" data-def="0.3" data-val="0.3" data-scale="log"><div class="fader-slot"><div class="fader-fill" id="e2r-fill"></div></div><div class="fader-cap" id="e2r-cap"></div></div><div class="knob-label">R</div></div>
+            <div class="knob-group"><svg class="knob-svg" data-id="e2a" data-param="eg2Attack"  data-min="0.001" data-max="3" data-def="0.005" data-val="0.005" data-scale="log" width="32" height="32" viewBox="0 0 32 32"><circle cx="16" cy="16" r="13" fill="url(#kbody)" stroke="#585850" stroke-width="1.5"/><circle cx="16" cy="16" r="10" fill="url(#kinner)"/><circle cx="16" cy="16" r="5" fill="#181410"/><line id="e2a-ind" x1="16" y1="16" x2="16" y2="5" stroke="#d8a820" stroke-width="2" stroke-linecap="round"/></svg><div class="knob-label">A</div></div>
+            <div class="knob-group"><svg class="knob-svg" data-id="e2d" data-param="eg2Decay"   data-min="0.01" data-max="3" data-def="0.2" data-val="0.2" data-scale="log" width="32" height="32" viewBox="0 0 32 32"><circle cx="16" cy="16" r="13" fill="url(#kbody)" stroke="#585850" stroke-width="1.5"/><circle cx="16" cy="16" r="10" fill="url(#kinner)"/><circle cx="16" cy="16" r="5" fill="#181410"/><line id="e2d-ind" x1="16" y1="16" x2="16" y2="5" stroke="#d8a820" stroke-width="2" stroke-linecap="round"/></svg><div class="knob-label">D</div></div>
+            <div class="knob-group"><svg class="knob-svg" data-id="e2s" data-param="eg2Sustain" data-min="0" data-max="1" data-def="0.7" data-val="0.7" width="32" height="32" viewBox="0 0 32 32"><circle cx="16" cy="16" r="13" fill="url(#kbody)" stroke="#585850" stroke-width="1.5"/><circle cx="16" cy="16" r="10" fill="url(#kinner)"/><circle cx="16" cy="16" r="5" fill="#181410"/><line id="e2s-ind" x1="16" y1="16" x2="16" y2="5" stroke="#d8a820" stroke-width="2" stroke-linecap="round"/></svg><div class="knob-label">S</div></div>
+            <div class="knob-group"><svg class="knob-svg" data-id="e2r" data-param="eg2Release" data-min="0.01" data-max="5" data-def="0.3" data-val="0.3" data-scale="log" width="32" height="32" viewBox="0 0 32 32"><circle cx="16" cy="16" r="13" fill="url(#kbody)" stroke="#585850" stroke-width="1.5"/><circle cx="16" cy="16" r="10" fill="url(#kinner)"/><circle cx="16" cy="16" r="5" fill="#181410"/><line id="e2r-ind" x1="16" y1="16" x2="16" y2="5" stroke="#d8a820" stroke-width="2" stroke-linecap="round"/></svg><div class="knob-label">R</div></div>
           </div>
         </div>
       </div>
@@ -1693,64 +1616,6 @@ function initKnobs() {
 }
 
 // ═══════════════════════════════════════════════
-//  ADSR FADERS  (EG panel — vertical sliders)
-// ═══════════════════════════════════════════════
-// Cap travel inside the .fader element: slot is inset 2px
-// top/bottom, cap is 13px tall → travel = 64 − 4 − 13 = 47px
-const FADER_TRAVEL = 47;
-
-function setFaderVisual(fd, norm) {
-  const id   = fd.dataset.id; if (!id) return;
-  const fill = document.getElementById(id + '-fill');
-  const cap  = document.getElementById(id + '-cap');
-  if (fill) fill.style.height = (norm * 100).toFixed(1) + '%';
-  if (cap)  cap.style.bottom  = (2 + norm * FADER_TRAVEL).toFixed(1) + 'px';
-}
-
-function initFaders() {
-  document.querySelectorAll('.fader').forEach(fd => {
-    const param = fd.dataset.param; if (!param) return;
-    const def = +fd.dataset.def;
-    S.params[param] = DEFS[param] !== undefined ? DEFS[param] : def;
-    setFaderVisual(fd, paramToNorm(fd, S.params[param]));
-
-    let startY = 0, startNorm = 0, dragging = false;
-    const getY = e => e.touches ? e.touches[0].clientY : e.clientY;
-
-    const onStart = e => {
-      e.preventDefault(); initAudio();
-      dragging = true; startY = getY(e);
-      startNorm = paramToNorm(fd, S.params[param]);
-      document.addEventListener('mousemove', onMove);
-      document.addEventListener('touchmove', onMove, {passive:false});
-      document.addEventListener('mouseup', onEnd);
-      document.addEventListener('touchend', onEnd);
-    };
-    const onMove = e => {
-      if (!dragging) return; e.preventDefault();
-      const dy = startY - getY(e);          // drag up = increase
-      const norm = Math.max(0, Math.min(1, startNorm + dy / FADER_TRAVEL));
-      setFaderVisual(fd, norm);
-      liveUpdate(param, normToParam(fd, norm));
-    };
-    const onEnd = () => {
-      dragging = false;
-      document.removeEventListener('mousemove', onMove);
-      document.removeEventListener('touchmove', onMove);
-      document.removeEventListener('mouseup', onEnd);
-      document.removeEventListener('touchend', onEnd);
-    };
-    fd.addEventListener('mousedown', onStart);
-    fd.addEventListener('touchstart', onStart, {passive:false});
-    fd.addEventListener('dblclick', () => {
-      S.params[param] = def;
-      setFaderVisual(fd, paramToNorm(fd, def));
-      liveUpdate(param, def);
-    });
-  });
-}
-
-// ═══════════════════════════════════════════════
 //  KEYBOARD  (top-aligned black keys)
 // ═══════════════════════════════════════════════
 const NOTE_NAMES = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
@@ -2370,13 +2235,6 @@ function applyState(st) {
       if (S.ctx) liveUpdate(p, S.params[p]);
     }
   });
-  document.querySelectorAll('.fader').forEach(f => {
-    const p = f.dataset.param;
-    if (p && S.params[p]!==undefined) {
-      setFaderVisual(f, paramToNorm(f, S.params[p]));
-      if (S.ctx) liveUpdate(p, S.params[p]);
-    }
-  });
   if (S.ctx && S.lfoNode) S.lfoNode.type = S.lfoWave;
   document.getElementById('octDisp').textContent = `C${S.octave}`;
   if (octaveChanged) { allNotesOff(); buildKeyboard(); }
@@ -2702,7 +2560,6 @@ function initWoodPanels() {
 document.addEventListener('DOMContentLoaded', () => {
   buildWaveSelectors();
   initKnobs();
-  initFaders();
   buildKeyboard();
   buildPresetBank();
   initWheels();

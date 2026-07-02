@@ -102,10 +102,10 @@ S = {
 ## Otevřené tasky (načti z Linear před prací)
 
 ```
-KOS-15 — ADSR: nahradit knoby vertikálními fadery (slot + ivory cap, drag up=zvýšit, dblclick=reset)
+(žádné — všechny tasky KOS-13/14/15 hotové; nové načti z Linear)
 ```
 
-Hotové: KOS-13 (realistický vizuál kol — PR #1), KOS-14 (boky z bahenního dubu — PR #2).
+Hotové: KOS-13 (realistický vizuál kol — PR #1), KOS-14 (boky z bahenního dubu — PR #2), KOS-15 (ADSR fadery — PR #3).
 
 ---
 
