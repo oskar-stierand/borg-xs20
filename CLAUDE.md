@@ -102,10 +102,11 @@ S = {
 ## Otevřené tasky (načti z Linear před prací)
 
 ```
-KOS-13 — Pitch/Mod kola: realistický vizuál (guma, ridges, 3D, Retina 2×)
 KOS-14 — Dřevěné boky: fotorealistický canvas (katedrální letokruhy, medullary flecks, varnišový lesk)
 KOS-15 — ADSR: nahradit knoby vertikálními fadery (slot + ivory cap, drag up=zvýšit, dblclick=reset)
 ```
+
+Hotové: KOS-13 (realistický vizuál kol — merged v PR #1).
 
 ---
 
@@ -119,7 +120,7 @@ git checkout -b kos-XX-kratky-popis
 git add index.html
 git commit -m "KOS-XX: stručný popis co bylo změněno"
 git push origin kos-XX-kratky-popis
-# → otevřít Merge Request na GitLabu
+# → otevřít Pull Request na GitHubu (gh pr create)
 ```
 
 Branch naming: `kos-{číslo}-{slug}` (stejný formát jako Linear `gitBranchName`).
