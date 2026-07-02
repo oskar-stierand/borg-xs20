@@ -2353,98 +2353,79 @@ let msgI = 0;
 setInterval(() => { document.getElementById('statusBar').textContent = MSGS[msgI=(msgI+1)%MSGS.length]; }, 3500);
 
 // ═══════════════════════════════════════════════
-//  BOG OAK SIDE PANELS  — Canvas procedural
+//  OAK WOOD SIDE PANELS  — Canvas procedural
 // ═══════════════════════════════════════════════
 /*
-  Renders dark bog oak (mořený dub) — desaturated grey-brown,
-  almost black, with the anatomy of real quarter/flat-sawn oak:
-  1. Per-pixel growth rings — nested cathedral arches around a
-     virtual pith placed far above/below the panel, distorted
-     by value noise (fBm) so no two rings are parallel
-  2. Medullary ray flecks — small pale lens shapes crossing the
-     rings (the silvery flecks typical of oak)
-  3. Fine micro-grain streaks + one subtle knot
-  4. Cool varnish sheen + edge shadows / neutral edge highlight
-
-  Note: ctx is pre-scaled by devicePixelRatio (initWoodPanels),
-  so vector drawing uses CSS px; the ImageData pass works in
-  device px and maps back through dpr.
+  Renders a convincing oak wood grain texture:
+  1. Base warm honey/amber gradient
+  2. Layered Perlin-like noise grain lines (bezier curves with
+     slight random deviation) — lighter/darker bands
+  3. Fine micro-grain overlay
+  4. Knot simulation (optional, subtle)
+  5. Varnish sheen — left-edge specular highlight
+  6. Dark edge shadows top/bottom + inner edge
 */
 
 function drawWoodPanel(canvas, side) {
+  const W = canvas.width;
+  const H = canvas.height;
   const ctx = canvas.getContext('2d');
-  const dpr = window.devicePixelRatio || 1;
-  const W = canvas.width  / dpr;   // CSS px (ctx is scaled by dpr)
-  const H = canvas.height / dpr;
 
+  // ── 1. base oak gradient ─────────────────────
+  const base = ctx.createLinearGradient(0, 0, W, 0);
+  if (side === 'left') {
+    base.addColorStop(0,    '#2a1a08');
+    base.addColorStop(0.12, '#5c3210');
+    base.addColorStop(0.35, '#8b5a22');
+    base.addColorStop(0.55, '#a8703a');
+    base.addColorStop(0.72, '#c4894e');
+    base.addColorStop(0.88, '#b07038');
+    base.addColorStop(1,    '#704018');
+  } else {
+    base.addColorStop(0,    '#704018');
+    base.addColorStop(0.12, '#b07038');
+    base.addColorStop(0.28, '#c4894e');
+    base.addColorStop(0.45, '#a8703a');
+    base.addColorStop(0.65, '#8b5a22');
+    base.addColorStop(0.88, '#5c3210');
+    base.addColorStop(1,    '#2a1a08');
+  }
+  ctx.fillStyle = base;
+  ctx.fillRect(0, 0, W, H);
+
+  // ── 2. wood grain lines ───────────────────────
   // Seeded pseudo-random for reproducible texture
   let seed = side === 'left' ? 42 : 137;
   const rng = () => { seed = (seed * 1664525 + 1013904223) & 0xffffffff; return (seed >>> 0) / 0xffffffff; };
 
-  // ── value noise (seeded) ──────────────────────
-  const P = new Uint8Array(256);
-  for (let i = 0; i < 256; i++) P[i] = i;
-  for (let i = 255; i > 0; i--) { const j = (rng() * (i + 1)) | 0; const t = P[i]; P[i] = P[j]; P[j] = t; }
-  const hash2 = (x, y) => P[(P[x & 255] + y) & 255] / 255;
-  const sm = t => t * t * (3 - 2 * t);
-  const vnoise = (x, y) => {
-    const ix = Math.floor(x), iy = Math.floor(y), u = sm(x - ix), v = sm(y - iy);
-    const a = hash2(ix, iy), b = hash2(ix + 1, iy), c = hash2(ix, iy + 1), d = hash2(ix + 1, iy + 1);
-    return a + (b - a) * u + (c - a) * v + (a - b - c + d) * u * v;
-  };
-  const fbm = (x, y) => vnoise(x, y) * 0.55 + vnoise(x * 2.7, y * 2.7) * 0.28 + vnoise(x * 6.1, y * 6.1) * 0.17;
+  const GRAIN_COUNT = 80;
+  for (let g = 0; g < GRAIN_COUNT; g++) {
+    const yBase   = rng() * H;
+    const waviness = 2 + rng() * 6;
+    const period   = H * (0.3 + rng() * 1.2);
+    const phase    = rng() * Math.PI * 2;
+    const dark     = rng() > 0.5;
+    const alpha    = 0.04 + rng() * 0.13;
+    const lineW    = 0.4 + rng() * 1.8;
 
-  // ── 1. growth rings (per-pixel, device res) ───
-  // Grain runs along the plank's long (vertical) axis: virtual
-  // pith far to the side → near-vertical ring lines that bow
-  // around an apex = cathedral arches pointing along the panel.
-  const pithX = side === 'left' ? -W * 5.5 : W * 6.5;
-  const pithY = H * (0.25 + rng() * 0.5);
-  const YSQUEEZE = 0.13;        // vertical squeeze → elongated arches
-  // bog oak palette — cold, desaturated, near-black
-  const loR = 19, loG = 14, loB = 11;    // latewood (dark ring line)
-  const hiR = 62, hiG = 53, hiB = 43;    // earlywood (lighter band)
-
-  const img = ctx.createImageData(canvas.width, canvas.height);
-  const data = img.data;
-  for (let dy = 0; dy < canvas.height; dy++) {
-    const y = dy / dpr;
-    for (let dx = 0; dx < canvas.width; dx++) {
-      const x = dx / dpr;
-      // distorted distance to pith → ring coordinate
-      // (noise stretched vertically so the grain wanders slowly
-      //  along the plank instead of swirling)
-      const wob = fbm(x * 0.05, y * 0.009) * 9;
-      const d   = Math.hypot(x - pithX, (y - pithY) * YSQUEEZE) + wob;
-      // ring spacing drifts slowly (4.5–9 px)
-      const spacing = 4.8 + fbm(x * 0.012, y * 0.003) * 4;
-      const frac = (d / spacing) % 1;
-      // latewood = narrow dark band at the end of each ring
-      const lw   = Math.pow(0.5 + 0.5 * Math.sin(frac * Math.PI * 2), 3.2);
-      // large-scale patchiness (staining unevenness of bog oak)
-      const patch = 0.86 + fbm(x * 0.006, y * 0.0035) * 0.26;
-      const t = lw * patch;
-      const i = (dy * canvas.width + dx) * 4;
-      data[i]     = (loR + (hiR - loR) * t) | 0;
-      data[i + 1] = (loG + (hiG - loG) * t) | 0;
-      data[i + 2] = (loB + (hiB - loB) * t) | 0;
-      data[i + 3] = 255;
-    }
-  }
-  ctx.putImageData(img, 0, 0);   // ignores transform → fills device px 1:1
-
-  // ── 2. medullary ray flecks ───────────────────
-  // Pale silvery lenses crossing the rings — rays radiate from
-  // the pith, so here they run horizontal-ish across the grain
-  for (let f = 0; f < 110; f++) {
-    const fx = rng() * W;
-    const fy = rng() * H;
-    const fl = 1.5 + rng() * 4.5;               // half-length
-    const fa = 0.04 + rng() * 0.09;
-    ctx.fillStyle = `rgba(186,172,148,${fa.toFixed(3)})`;
     ctx.beginPath();
-    ctx.ellipse(fx, fy, fl, 0.55 + rng() * 0.5, (rng() - 0.5) * 0.35, 0, Math.PI * 2);
-    ctx.fill();
+    ctx.moveTo(0, yBase);
+
+    const steps = 24;
+    for (let i = 1; i <= steps; i++) {
+      const x  = (i / steps) * W;
+      const y  = yBase + Math.sin((x / period) * Math.PI * 2 + phase) * waviness
+                       + Math.sin((x / (period * 0.3)) * Math.PI * 2 + phase * 1.7) * (waviness * 0.3);
+      const px = ((i - 0.5) / steps) * W;
+      const py = yBase + Math.sin((px / period) * Math.PI * 2 + phase) * waviness;
+      ctx.quadraticCurveTo(px, py, x, y);
+    }
+
+    ctx.strokeStyle = dark
+      ? `rgba(30,14,4,${alpha})`
+      : `rgba(230,180,100,${alpha * 0.7})`;
+    ctx.lineWidth  = lineW;
+    ctx.stroke();
   }
 
   // ── 3. fine micro-grain ───────────────────────
@@ -2456,20 +2437,21 @@ function drawWoodPanel(canvas, side) {
     ctx.beginPath();
     ctx.moveTo(x0, y);
     ctx.lineTo(x0 + len, y + (rng() - 0.5) * 1.5);
-    ctx.strokeStyle = rng() > 0.5 ? `rgba(8,5,3,${alpha})` : `rgba(150,138,118,${alpha * 0.6})`;
+    ctx.strokeStyle = rng() > 0.5 ? `rgba(20,8,2,${alpha})` : `rgba(220,160,80,${alpha})`;
     ctx.lineWidth = 0.4 + rng() * 0.5;
     ctx.stroke();
   }
 
   // ── 4. subtle knot ────────────────────────────
-  {
-    const kx = W * (0.25 + rng() * 0.5);
-    const ky = H * (0.2 + rng() * 0.6);
-    const kr = 4 + rng() * 7;
+  for (let k = 0; k < 2; k++) {
+    const kx = W * (0.2 + rng() * 0.6);
+    const ky = H * (0.15 + rng() * 0.7);
+    const kr = 4 + rng() * 9;
+    // dark ring
     const kg = ctx.createRadialGradient(kx, ky, 0, kx, ky, kr * 2.5);
-    kg.addColorStop(0,   'rgba(8,5,3,0.5)');
-    kg.addColorStop(0.4, 'rgba(8,5,3,0.24)');
-    kg.addColorStop(0.7, 'rgba(40,30,20,0.08)');
+    kg.addColorStop(0,   'rgba(18,8,2,0.45)');
+    kg.addColorStop(0.4, 'rgba(18,8,2,0.22)');
+    kg.addColorStop(0.7, 'rgba(80,40,10,0.08)');
     kg.addColorStop(1,   'rgba(0,0,0,0)');
     ctx.fillStyle = kg;
     ctx.beginPath();
@@ -2477,18 +2459,18 @@ function drawWoodPanel(canvas, side) {
     ctx.fill();
   }
 
-  // ── 5. varnish sheen (cool, glossy) ───────────
+  // ── 5. varnish sheen ─────────────────────────
   const sheen = ctx.createLinearGradient(0, 0, W, 0);
   if (side === 'left') {
-    sheen.addColorStop(0,    'rgba(245,240,230,0.0)');
-    sheen.addColorStop(0.18, 'rgba(245,240,230,0.16)');
-    sheen.addColorStop(0.35, 'rgba(240,235,225,0.06)');
-    sheen.addColorStop(1,    'rgba(245,240,230,0.0)');
+    sheen.addColorStop(0,    'rgba(255,230,180,0.0)');
+    sheen.addColorStop(0.18, 'rgba(255,230,180,0.18)');
+    sheen.addColorStop(0.35, 'rgba(255,220,160,0.08)');
+    sheen.addColorStop(1,    'rgba(255,230,180,0.0)');
   } else {
-    sheen.addColorStop(0,    'rgba(245,240,230,0.0)');
-    sheen.addColorStop(0.65, 'rgba(240,235,225,0.06)');
-    sheen.addColorStop(0.82, 'rgba(245,240,230,0.16)');
-    sheen.addColorStop(1,    'rgba(245,240,230,0.0)');
+    sheen.addColorStop(0,    'rgba(255,230,180,0.0)');
+    sheen.addColorStop(0.65, 'rgba(255,220,160,0.08)');
+    sheen.addColorStop(0.82, 'rgba(255,230,180,0.18)');
+    sheen.addColorStop(1,    'rgba(255,230,180,0.0)');
   }
   ctx.fillStyle = sheen;
   ctx.fillRect(0, 0, W, H);
@@ -2523,8 +2505,8 @@ function drawWoodPanel(canvas, side) {
     side === 'left' ? 0 : W, 0,
     side === 'left' ? 6 : W - 6, 0
   );
-  outerHL.addColorStop(0, 'rgba(225,215,195,0.2)');
-  outerHL.addColorStop(1, 'rgba(225,215,195,0)');
+  outerHL.addColorStop(0, 'rgba(255,200,120,0.22)');
+  outerHL.addColorStop(1, 'rgba(255,200,120,0)');
   ctx.fillStyle = outerHL;
   ctx.fillRect(0, 0, W, H);
 }
