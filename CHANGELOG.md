@@ -4,6 +4,16 @@ Všechny změny jsou řazeny od nejnovějších. Formát vychází z [Keep a Cha
 
 ---
 
+## [5.5] — 2026-07-02
+
+### Přidáno
+- **Arpeggiator (KOS-16)** — vstupní vrstva mezi klávesami/MIDI a voice enginem: MODE (up/down/up-down/random), RATE (1–20 Hz, log knob, live), OCTAVES (1–3), HOLD/latch (nový akord přepíše latch); scheduler taktovaný Web Audio clockem (self-correcting, gate 62 %); stav arpu se ukládá do presetů; panel vpravo od klaviatury
+
+### Opraveno
+- **Skákání hlavičky** — stavový displej má fixní šířku 220 px (delší zprávy se oříznou) a počítadlo hlasů fixních 56 px; změny textu už nehýbou layoutem
+
+---
+
 ## [5.4] — 2026-07-02
 
 ### Přidáno

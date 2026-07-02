@@ -142,10 +142,7 @@ body {
   color: var(--ms-green2);
   text-shadow: 0 0 8px var(--ms-green);
   letter-spacing: 2px;
-  width: 220px;              /* fixed — no layout jumps as messages change */
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  min-width: 160px;
   text-align: center;
 }
 
@@ -353,32 +350,6 @@ body {
   pointer-events: none;
   z-index: 60;
 }
-
-/* ── ARPEGGIATOR PANEL (KOS-16) ──────────────── */
-.arp-panel {
-  display: flex; flex-direction: column; gap: 6px;
-  justify-content: center;
-  padding: 8px 10px;
-  background: #1b1b17;
-  border: 1px solid #333;
-  border-radius: 6px;
-  flex-shrink: 0;
-  align-self: stretch;
-}
-.arp-title {
-  font-size: 7px; color: #777; letter-spacing: 2px;
-  font-family: 'Share Tech Mono', monospace;
-  text-align: center;
-}
-.arp-row { display: flex; gap: 4px; align-items: center; justify-content: center; }
-.arp-btn {
-  padding: 3px 7px; background: #222; border: 1px solid #444;
-  border-radius: 3px; color: var(--ms-cream2);
-  font-family: 'Share Tech Mono', monospace; font-size: 8px;
-  cursor: pointer; transition: all .12s;
-}
-.arp-btn:hover { border-color: var(--ms-orange); color: var(--ms-orange); }
-.arp-btn.active { background: var(--ms-orange); color: #181410; border-color: var(--ms-orange); }
 
 /* ── WAVE SELECTOR ────────────────────────────── */
 .wave-row {
@@ -768,7 +739,7 @@ body {
         <span id="midiTxt">NO MIDI</span>
       </div>
       <div class="status-bar" id="statusBar">READY</div>
-      <div style="font-size:8px;color:#555;letter-spacing:1px;width:56px;text-align:right;" id="voiceTxt">0 VOICES</div>
+      <div style="font-size:8px;color:#555;letter-spacing:1px;" id="voiceTxt">0 VOICES</div>
     </div>
   </div>
 
@@ -978,32 +949,6 @@ body {
       <!-- ── KEYS ── -->
       <div class="keyboard-wrap" id="keysWrap" style="flex:1;"></div>
 
-      <!-- ── ARPEGGIATOR ── -->
-      <div class="arp-panel">
-        <div class="arp-title">ARPEGGIATOR</div>
-        <div class="arp-row">
-          <button class="arp-btn" id="arpPower">ON</button>
-          <button class="arp-btn" id="arpHold">HOLD</button>
-        </div>
-        <div class="arp-row" id="arpModes">
-          <button class="arp-btn" data-mode="up">UP</button>
-          <button class="arp-btn" data-mode="down">DN</button>
-          <button class="arp-btn" data-mode="updown">UD</button>
-          <button class="arp-btn" data-mode="random">RND</button>
-        </div>
-        <div class="arp-row">
-          <div class="arp-row" id="arpOcts">
-            <button class="arp-btn" data-oct="1">1</button>
-            <button class="arp-btn" data-oct="2">2</button>
-            <button class="arp-btn" data-oct="3">3</button>
-          </div>
-          <div class="knob-group">
-            <svg class="knob-svg" data-id="arate" data-param="arpRate" data-min="1" data-max="20" data-def="8" data-val="8" data-scale="log" width="38" height="38" viewBox="0 0 38 38"><circle cx="19" cy="19" r="16" fill="url(#kbody)" stroke="#585850" stroke-width="1.5"/><circle cx="19" cy="19" r="13" fill="url(#kinner)"/><circle cx="19" cy="19" r="6" fill="#181410"/><line id="arate-ind" x1="19" y1="19" x2="19" y2="5" stroke="#f07820" stroke-width="2.5" stroke-linecap="round"/></svg>
-            <div class="knob-label">RATE</div>
-          </div>
-        </div>
-      </div>
-
     </div>
   </div>
 
@@ -1114,9 +1059,6 @@ const S = {
   ctx: null,
   lfoNode:null, lfoGain:null, lfoFiltGain:null,
   patched: { pitch: true, filter: true },  // patch cables (KOS-17): normalled = plugged at boot
-  arp: { on: false, mode: 'up', octaves: 1, hold: false },  // arpeggiator (KOS-16); rate lives in params.arpRate
-  arpHeld: [],   // physically held midi notes (input layer)
-  arpLatch: [],  // latched notes while HOLD is on
   convolver:null, reverbGain:null, dryGain:null,
   delayNode:null, delayFb:null, delayMix:null,
   chorusDelay:null, chorusMix:null,
@@ -2219,127 +2161,10 @@ function buildKeyboard() {
   });
 }
 
-// ═══════════════════════════════════════════════
-//  ARPEGGIATOR  (KOS-16)
-// ═══════════════════════════════════════════════
-/*
-  Input layer between the keys/MIDI and the voice engine: with the
-  arp ON, pressed keys are collected instead of played and a
-  scheduler triggers noteOn()/noteOff() steps. Timing is clocked
-  by ctx.currentTime — each step re-schedules itself with a delay
-  computed from the audio clock, so it self-corrects and never
-  drifts (lookahead pattern, no free-running setInterval).
-*/
-
-let arpTimer = null, arpGateTimer = null, arpNextTime = 0, arpIdx = 0, arpSounding = null;
-
-function arpPlayable() { return S.arp.hold ? S.arpLatch : S.arpHeld; }
-
-function arpSequence() {
-  const base = [...arpPlayable()].sort((a, b) => a - b);
-  const seq = [];
-  for (let o = 0; o < S.arp.octaves; o++)
-    for (const n of base) seq.push(n + 12 * o);
-  return seq;
-}
-
-function arpStop() {
-  clearTimeout(arpTimer);     arpTimer = null;
-  clearTimeout(arpGateTimer); arpGateTimer = null;
-  if (arpSounding !== null) { noteOff(arpSounding); arpSounding = null; }
-  arpIdx = 0;
-}
-
-function arpStart() {
-  if (arpTimer || !S.arp.on || !arpPlayable().length) return;
-  initAudio();
-  arpIdx = 0;
-  arpNextTime = S.ctx.currentTime + 0.03;
-  arpStep();
-}
-
-function arpStep() {
-  if (!S.arp.on) { arpStop(); return; }
-  const seq = arpSequence();
-  if (!seq.length) { arpStop(); return; }
-
-  const L = seq.length;
-  let note;
-  if      (S.arp.mode === 'random') note = seq[(Math.random() * L) | 0];
-  else if (S.arp.mode === 'up')     note = seq[arpIdx++ % L];
-  else if (S.arp.mode === 'down')   note = seq[L - 1 - (arpIdx++ % L)];
-  else {                            // up-down ping-pong
-    if (L === 1) note = seq[0];
-    else {
-      const period = 2 * L - 2;
-      const k = arpIdx++ % period;
-      note = seq[k < L ? k : period - k];
-    }
-  }
-
-  if (arpSounding !== null) noteOff(arpSounding);
-  noteOn(note, 0.72 + Math.random() * 0.12);
-  arpSounding = note;
-
-  // gate ~62 %: release before the next step
-  const stepDur = 1 / Math.max(0.5, S.params.arpRate || 8);
-  clearTimeout(arpGateTimer);
-  arpGateTimer = setTimeout(() => {
-    if (arpSounding === note) { noteOff(note); arpSounding = null; }
-  }, stepDur * 620);
-
-  arpNextTime += stepDur;
-  arpTimer = setTimeout(arpStep, Math.max(0, (arpNextTime - S.ctx.currentTime) * 1000));
-}
-
-// input layer — all key/MIDI paths go through these
-function inputNoteOn(midi, vel) {
-  if (!S.arp.on) { noteOn(midi, vel); return; }
-  if (S.arp.hold && S.arpHeld.length === 0) S.arpLatch = [];  // new chord replaces the latch
-  if (!S.arpHeld.includes(midi)) S.arpHeld.push(midi);
-  if (S.arp.hold && !S.arpLatch.includes(midi)) S.arpLatch.push(midi);
-  arpStart();
-}
-
-function inputNoteOff(midi) {
-  if (!S.arp.on) { noteOff(midi); return; }
-  const i = S.arpHeld.indexOf(midi);
-  if (i !== -1) S.arpHeld.splice(i, 1);
-  if (!S.arp.hold && !S.arpHeld.length) arpStop();
-}
-
-function syncArpUI() {
-  document.getElementById('arpPower').classList.toggle('active', S.arp.on);
-  document.getElementById('arpHold').classList.toggle('active', S.arp.hold);
-  document.querySelectorAll('#arpModes .arp-btn').forEach(b =>
-    b.classList.toggle('active', b.dataset.mode === S.arp.mode));
-  document.querySelectorAll('#arpOcts .arp-btn').forEach(b =>
-    b.classList.toggle('active', +b.dataset.oct === S.arp.octaves));
-}
-
-function initArp() {
-  document.getElementById('arpPower').addEventListener('click', () => {
-    S.arp.on = !S.arp.on;
-    if (!S.arp.on) { arpStop(); S.arpHeld.length = 0; S.arpLatch.length = 0; }
-    syncArpUI();
-  });
-  document.getElementById('arpHold').addEventListener('click', () => {
-    S.arp.hold = !S.arp.hold;
-    if (S.arp.hold) S.arpLatch = [...S.arpHeld];
-    else if (!S.arpHeld.length) arpStop();
-    syncArpUI();
-  });
-  document.querySelectorAll('#arpModes .arp-btn').forEach(b =>
-    b.addEventListener('click', () => { S.arp.mode = b.dataset.mode; syncArpUI(); }));
-  document.querySelectorAll('#arpOcts .arp-btn').forEach(b =>
-    b.addEventListener('click', () => { S.arp.octaves = +b.dataset.oct; syncArpUI(); }));
-  syncArpUI();
-}
-
 function setupKey(el) {
   const getMidi = () => parseInt(el.dataset.midi);
-  const on  = e => { e.preventDefault(); const v = 0.68 + Math.random()*.18; inputNoteOn(getMidi(), v); el.classList.add('on'); };
-  const off = e => { e.preventDefault(); inputNoteOff(getMidi()); el.classList.remove('on'); };
+  const on  = e => { e.preventDefault(); const v = 0.68 + Math.random()*.18; noteOn(getMidi(), v); el.classList.add('on'); };
+  const off = e => { e.preventDefault(); noteOff(getMidi()); el.classList.remove('on'); };
   el.addEventListener('mousedown', on);
   el.addEventListener('mouseenter', e => { if (e.buttons & 1) on(e); });
   el.addEventListener('mouseup', off);
@@ -2357,13 +2182,13 @@ document.addEventListener('keydown', e => {
   if (e.key==='x') { changeOct( 1); return; }
   const off = KEYS_MAP[e.key.toLowerCase()]; if (off===undefined) return;
   const midi = (S.octave+1)*12 + off;
-  inputNoteOn(midi, 0.75);
+  noteOn(midi, 0.75);
   highlight(midi, true);
 });
 document.addEventListener('keyup', e => {
   const off = KEYS_MAP[e.key.toLowerCase()]; if (off===undefined) return;
   const midi = (S.octave+1)*12 + off;
-  inputNoteOff(midi);
+  noteOff(midi);
   highlight(midi, false);
 });
 function highlight(midi, on) {
@@ -2691,8 +2516,8 @@ function initMIDI() {
       inp.onmidimessage = msg => {
         initAudio();
         const [st, d1, d2] = msg.data, cmd = st & 0xF0;
-        if (cmd===0x90 && d2>0) { inputNoteOn(d1, d2/127); highlight(d1, true); }
-        else if (cmd===0x80 || (cmd===0x90 && d2===0)) { inputNoteOff(d1); highlight(d1, false); }
+        if (cmd===0x90 && d2>0) { noteOn(d1, d2/127); highlight(d1, true); }
+        else if (cmd===0x80 || (cmd===0x90 && d2===0)) { noteOff(d1); highlight(d1, false); }
         else if (cmd===0xE0) { const b=((d2<<7)|d1)-8192; S.pitchBend=b/8192; applyPitchBend(); }
         else if (cmd===0xB0) {
           if (d1===1) { if(S.lfoFiltGain) S.lfoGain.gain.setTargetAtTime((S.params.lfoPitch+d2/127*.5)*100*(S.patched.pitch?1:0),S.ctx.currentTime,.01); }
@@ -2872,7 +2697,7 @@ function buildPresetBank() {
 }
 
 function captureState() {
-  return { params:{...S.params}, vco1Wave:S.vco1Wave, vco2Wave:S.vco2Wave, lfoWave:S.lfoWave, octave:S.octave, patched:{...S.patched}, arp:{...S.arp} };
+  return { params:{...S.params}, vco1Wave:S.vco1Wave, vco2Wave:S.vco2Wave, lfoWave:S.lfoWave, octave:S.octave, patched:{...S.patched} };
 }
 
 function applyState(st) {
@@ -2890,11 +2715,6 @@ function applyState(st) {
   };
   if (window.syncPatchCables) syncPatchCables();
   if (S.ctx) updatePatchRouting();
-  // arpeggiator — old presets without the field keep defaults (off)
-  arpStop();
-  S.arp = Object.assign({ on: false, mode: 'up', octaves: 1, hold: false }, st.arp || {});
-  S.arpHeld.length = 0; S.arpLatch.length = 0;
-  syncArpUI();
   document.querySelectorAll('.knob-svg').forEach(s => {
     const p = s.dataset.param;
     if (p && S.params[p]!==undefined) {
@@ -3236,7 +3056,6 @@ document.addEventListener('DOMContentLoaded', () => {
   initKnobs();
   initFaders();
   initPatchbay();
-  initArp();
   buildKeyboard();
   buildPresetBank();
   initWheels();
