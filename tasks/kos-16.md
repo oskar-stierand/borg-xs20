@@ -1,6 +1,6 @@
 # KOS-16 — Arpeggiator (mode, rate, octaves, hold)
 
-**Status:** Todo
+**Status:** Done (v5.5, PR #5)
 
 ## Popis
 
