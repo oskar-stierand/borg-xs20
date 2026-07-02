@@ -450,8 +450,8 @@ body {
 
 /* ── MS-20 REALISTIC ROTARY WHEELS ─────────────── */
 /*
-   Rendered via Canvas — a cylindrical rubber wheel viewed
-   from a slight angle, with perspective-foreshortened grooves.
+   Rendered via Canvas — a rubber wheel rim seen edge-on through
+   a slot; grip ridges as full-width bars, foreshortened vertically.
    Housing is a recessed slot with cast shadow & metal lip.
 */
 .wheels {
@@ -940,7 +940,7 @@ const S = {
 
 
 // ═══════════════════════════════════════════════
-//  ANALOG ENGINE v4 — MS-20 CHARACTER
+//  ANALOG ENGINE — MS-20 CHARACTER
 //  • Steiner-Parker-like filter simulation
 //    (3x biquad cascade + resonance saturation)
 //  • Per-voice VCO thermal drift (band-limited
@@ -1732,22 +1732,20 @@ document.getElementById('btnOctUp').addEventListener('click', () => changeOct( 1
 //  REALISTIC ROTARY WHEELS  — Canvas 3D cylinder
 // ═══════════════════════════════════════════════
 /*
-  We render a rubber cylinder viewed from a slight angle.
-  Technique: for each groove on the cylinder surface we project
-  the 3D circle onto 2D using a simple cylindrical perspective —
-  grooves near the visible equator (centre) appear as near-flat
-  lines; grooves near the edges curve away = foreshortened ellipses.
+  We render the rim of a rubber wheel seen edge-on through a slot.
+  The grip ridges run parallel to the wheel's axis, so they project
+  as straight horizontal bars at full rim width — only vertical
+  position, spacing and lighting foreshorten with rotation.
 
   Model:
-    - Cylinder radius R, viewed from angle θ above equator
-    - The visible arc spans ±αMax from the front
-    - Rotation angle φ shifts all grooves
-    - Each groove at angle α from front projects to:
-        y_canvas = cy + R·sin(α)·cos(θ)          (vertical pos)
-        semiX    = R·cos(α)                        (ellipse half-width)
-        semiY    = semiX · sin(θ) · 0.18           (ellipse depth / foreshorten)
+    - Wheel radius R, rotation angle φ shifts all ridges
+    - Ridge at angle α from the front projects to:
+        y_canvas  = cy − R·sin(α)·0.82     (vertical pos, follows drag)
+        thickness ∝ cos(α)                  (foreshortened near edges)
+    - Only the front hemisphere (cos α > 0) is visible
 
-  Lighting: simple diffuse — brightness = cos(α)^0.7, clipped
+  Lighting: diffuse cos(α)^0.5 + ambient; specular line on each
+  ridge's upper edge (light from above); static rubber micro-grain.
 */
 
 function createWheelCanvas(housing, isPitch) {

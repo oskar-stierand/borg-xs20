@@ -2,7 +2,7 @@
 
 > Webový syntezátor inspirovaný legendárním Korg MS-20. Běží přímo v prohlížeči, podporuje MIDI klávesy, single-file HTML.
 
-![Version](https://img.shields.io/badge/version-4.1--bugfix-orange)
+![Version](https://img.shields.io/badge/version-5.1-orange)
 ![License](https://img.shields.io/badge/license-MIT-green)
 ![Audio](https://img.shields.io/badge/Web%20Audio%20API-v2-blue)
 
@@ -92,7 +92,7 @@ Viz [CHANGELOG.md](./CHANGELOG.md)
 Tasky jsou vedeny v [Linear — BORG XS20](https://linear.app/kostohryz/project/borg-xs20-528feb2422c3).
 
 Aktuálně otevřené:
-- [ ] KOS-13 — Pitch/Mod kola: realistický vizuál (guma, ridges, 3D)
+- [x] KOS-13 — Pitch/Mod kola: realistický vizuál (guma, ridges, 3D) — *hotovo v 5.1 (PR #1)*
 - [ ] KOS-14 — Dřevěné boky: fotorealistický canvas rendering
 - [ ] KOS-15 — ADSR: nahradit knoby vertikálními fadery
 

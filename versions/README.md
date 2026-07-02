@@ -1,13 +1,10 @@
 # versions/
 
-Archiv jednotlivých iterací. Soubory jsou generovány automaticky při každém milníku.
+Archiv jednotlivých iterací — záloha se vytváří před každou větší změnou (viz CLAUDE.md).
 
 | Soubor | Verze | Popis |
 |--------|-------|-------|
-| `index-v1.html` | 1.0 | Základní audio engine + UI |
-| `index-v2.html` | 2.0 | Pitch/Mod kola + factory presety + BORG XS-20 branding |
-| `index-v3.html` | 3.0 | Dřevěné boky + audio diagnóza |
-| `index-v4.html` | 4.0 | Analogový audio engine (Steiner-Parker, saturace, VCO drift) |
-| `index-v4-bugfix.html` | 4.1 | Bugfixy: MIDI vizuál + oktáva klaviatury |
+| `index-v4.1-pre-v5.html` | 4.1-bugfix | Stav před v5.0 (FX routing, PWM, vizuál kláves/knobů) |
+| `index-v5.0.html` | 5.0 | Stav před KOS-13 (realistická projekce Pitch/Mod kol) |
 
 Aktuální produkční verze je vždy `../index.html`.

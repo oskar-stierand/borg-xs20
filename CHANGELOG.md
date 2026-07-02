@@ -4,6 +4,14 @@ Všechny změny jsou řazeny od nejnovějších. Formát vychází z [Keep a Cha
 
 ---
 
+## [5.1] — 2026-07-02
+
+### Změněno
+- **Pitch/Mod kola: realistická projekce (KOS-13)** — žebra běží rovnoběžně s osou otáčení, takže se promítají jako rovné pruhy v plné šířce ráfku (dřívější sférická projekce dělala z kol „soudek"); barevný marker jede s povrchem gumy místo fixní pozice na rovníku; povrch nyní sleduje směr tahu prstem
+- **Guma kol** — statická mikro-zrno textura (overlay composite), spekulární highlight na horní hraně každého žebra (světlo shora), silnější středový odlesk
+
+---
+
 ## [5.0] — 2026-07-02
 
 ### Opraveno
