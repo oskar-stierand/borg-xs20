@@ -8,8 +8,8 @@ Tento soubor popisuje jak pracovat s projektem BORG XS-20. Přečti ho vždy př
 
 **BORG XS-20** je single-file webový syntezátor v `index.html`. Žádný build, žádné závislosti, žádný Node.js — vše je v jednom souboru.
 
-Tasky jsou vedeny v **Linear, workspace Kostohryz, projekt BORG XS20**.  
-Před každou prací načti otevřené issues: stav `Todo` v projektu BORG XS20.
+Tasky jsou vedeny ve složce **`tasks/`** — jeden soubor na task, pojmenovaný `kos-{číslo}.md` (např. `tasks/kos-16.md`). Linear zatím nepoužíváme; formát je ale Linear-importovatelný (H1 = titulek s ID, **Status:** Todo/In Progress/Done, sekce Popis) a Oskar je tam později hromadně nahraje — strukturu neměnit.  
+Před každou prací načti soubory se statusem `Todo` z `tasks/`.
 
 ---
 
@@ -19,7 +19,7 @@ Před každou prací načti otevřené issues: stav `Todo` v projektu BORG XS20.
 - **Chirurgické změny** — měň jen to co je v tasku. Jeden task = jedna izolovaná změna.
 - **Syntax check** po každé změně: `node -e "new Function(js)"` na JS blok
 - **Záloha před změnou** — zkopíruj aktuální `index.html` do `versions/index-vX.html`
-- **Linear update** — po dokončení tasku změň stav na `Done`
+- **Task update** — po dokončení tasku přepiš v `tasks/kos-XX.md` status na `Done (vX.Y, PR #N)`
 
 ### ❌ Nikdy
 - Nespouštěj více vizuálních přepisů najednou (viz zahozenou v5 — poučení z praxe)
@@ -99,13 +99,9 @@ S = {
 
 ---
 
-## Otevřené tasky (načti z Linear před prací)
+## Otevřené tasky
 
-```
-KOS-16 — Arpeggiator: mode (up/down/up-down/random), rate (log 1–20 Hz), octaves (1–3), hold/latch; lookahead scheduler nad Web Audio clockem volající noteOn()/noteOff(), stav v presetech
-```
-
-Hotové: KOS-13 (realistický vizuál kol — PR #1), KOS-14 (boky z bahenního dubu — PR #2), KOS-15 (ADSR fadery — PR #3).
+Jediný zdroj pravdy je složka **`tasks/`** (`kos-{číslo}.md`, jeden soubor na task) — `Status: Todo` = otevřené, `Status: Done` = hotová historie. Tady v CLAUDE.md se tasky nevedou.
 
 ---
 

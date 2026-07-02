@@ -89,12 +89,12 @@ Viz [CHANGELOG.md](./CHANGELOG.md)
 
 ## 🗺️ Roadmap
 
-Tasky jsou vedeny v [Linear — BORG XS20](https://linear.app/kostohryz/project/borg-xs20-528feb2422c3).
+Tasky jsou vedeny ve složce [`tasks/`](./tasks/) — jeden soubor na task (`kos-{číslo}.md`).
 
-Aktuálně otevřené:
-- [x] KOS-13 — Pitch/Mod kola: realistický vizuál (guma, ridges, 3D) — *hotovo v 5.1 (PR #1)*
-- [x] KOS-14 — Dřevěné boky: fotorealistický canvas rendering — *hotovo v 5.2 (bahenní dub)*
-- [x] KOS-15 — ADSR: nahradit knoby vertikálními fadery — *hotovo v 5.3*
+- [ ] [KOS-16](./tasks/kos-16.md) — Arpeggiator (mode, rate, octaves, hold)
+- [x] [KOS-15](./tasks/kos-15.md) — ADSR: vertikální fadery — *v5.3*
+- [x] [KOS-14](./tasks/kos-14.md) — Dřevěné boky: bahenní dub — *v5.2*
+- [x] [KOS-13](./tasks/kos-13.md) — Pitch/Mod kola: realistický vizuál — *v5.1*
 
 ## 📄 Licence
 
