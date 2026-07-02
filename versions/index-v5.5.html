@@ -2724,7 +2724,7 @@ const FACTORY_PRESETS = [
       eg2Attack:0.003, eg2Decay:0.5,  eg2Sustain:0.55, eg2Release:1.8,
       lfoRate:4.5, lfoPitch:0.03, lfoFilter:0.08,
       reverbMix:0.45, delayMix:0.18, chorusMix:0.35,
-      masterVol:0.75, glide:0, arpRate:8,
+      masterVol:0.75, glide:0,
     },
     vco1Wave:'triangle', vco2Wave:'sawtooth', lfoWave:'sine', octave:3,
   },
@@ -2740,13 +2740,9 @@ const FACTORY_PRESETS = [
       eg2Attack:0.001, eg2Decay:0.18, eg2Sustain:0.0,  eg2Release:0.25,
       lfoRate:0.3, lfoPitch:0, lfoFilter:0.12,
       reverbMix:0.1, delayMix:0.22, chorusMix:0.0,
-      masterVol:0.75, glide:0.04, arpRate:8.5,
+      masterVol:0.75, glide:0.04,
     },
     vco1Wave:'sawtooth', vco2Wave:'sawtooth', lfoWave:'sine', octave:2,
-    // hypnotic bass groove: latched UP arp over 2 octaves rides
-    // the tight filter envelope; slow LFO breath via FILTER cable
-    arp:{ on:true, mode:'up', octaves:2, hold:true },
-    patched:{ pitch:false, filter:true },
   },
 
   // 3 ── "DREAMLAND" (Robert Miles — floating pad)
@@ -2760,7 +2756,7 @@ const FACTORY_PRESETS = [
       eg2Attack:0.9, eg2Decay:0.5,  eg2Sustain:0.8, eg2Release:2.5,
       lfoRate:0.6,  lfoPitch:0.04, lfoFilter:0.2,
       reverbMix:0.65, delayMix:0.3, chorusMix:0.55,
-      masterVol:0.7, glide:0.12, arpRate:8,
+      masterVol:0.7, glide:0.12,
     },
     vco1Wave:'sawtooth', vco2Wave:'triangle', lfoWave:'sine', octave:3,
   },
@@ -2774,33 +2770,27 @@ const FACTORY_PRESETS = [
       hpfCutoff:30, lpfCutoff:900, resonance:16, filterEnvAmt:0.85,
       eg1Attack:0.005, eg1Decay:0.4,  eg1Sustain:0.35, eg1Release:0.6,
       eg2Attack:0.005, eg2Decay:0.3,  eg2Sustain:0.65, eg2Release:0.5,
-      lfoRate:5.5, lfoPitch:0.04, lfoFilter:0.35,
+      lfoRate:5.5, lfoPitch:0.0, lfoFilter:0.35,
       reverbMix:0.3, delayMix:0.0, chorusMix:0.2,
-      masterVol:0.75, glide:0.06, arpRate:8,
+      masterVol:0.75, glide:0.06,
     },
     vco1Wave:'sawtooth', vco2Wave:'sawtooth', lfoWave:'triangle', octave:3,
-    // cable showcase: both routes plugged — the sweeping wobble
-    // lives and dies with the FILTER cable
-    patched:{ pitch:true, filter:true },
   },
 
-  // 5 ── "EMINENT 310" (Jean-Michel Jarre — lush string machine)
+  // 5 ── "EQUINOXE" (Jean-Michel Jarre — pulsing sequence)
   {
-    name: 'EMINENT 310',
+    name: 'EQUINOXE',
     params: {
-      vco1Freq:0,   vco1Fine:-6,  vco1PW:0.5,  vco1Level:0.75,
-      vco2Freq:0,   vco2Fine:8,   vco2PW:0.5,  vco2Level:0.75,
-      hpfCutoff:140, lpfCutoff:5200, resonance:0.8, filterEnvAmt:0.1,
-      eg1Attack:0.4,  eg1Decay:0.8, eg1Sustain:0.75, eg1Release:1.0,
-      eg2Attack:0.35, eg2Decay:0.4, eg2Sustain:0.85, eg2Release:1.4,
-      lfoRate:4.8, lfoPitch:0.02, lfoFilter:0.06,
-      reverbMix:0.45, delayMix:0.12, chorusMix:0.85,
-      masterVol:0.72, glide:0.0, arpRate:8,
+      vco1Freq:0,    vco1Fine:0,    vco1PW:0.25, vco1Level:0.9,
+      vco2Freq:-12,  vco2Fine:5,    vco2PW:0.25, vco2Level:0.7,
+      hpfCutoff:80,  lpfCutoff:450, resonance:18, filterEnvAmt:1.0,
+      eg1Attack:0.001, eg1Decay:0.15, eg1Sustain:0.05, eg1Release:0.2,
+      eg2Attack:0.001, eg2Decay:0.12, eg2Sustain:0.0,  eg2Release:0.15,
+      lfoRate:0.4, lfoPitch:0.0, lfoFilter:0.0,
+      reverbMix:0.12, delayMix:0.38, chorusMix:0.0,
+      masterVol:0.75, glide:0.0,
     },
-    vco1Wave:'sawtooth', vco2Wave:'sawtooth', lfoWave:'sine', octave:3,
-    // no arp — just two detuned saws drowned in chorus (the Solina
-    // trick); gentle shimmer rides both cables
-    patched:{ pitch:true, filter:true },
+    vco1Wave:'square', vco2Wave:'square', lfoWave:'square', octave:2,
   },
 
   // 6 ── "LASER HARP" (Jean-Michel Jarre — bright pluck)
@@ -2814,34 +2804,25 @@ const FACTORY_PRESETS = [
       eg2Attack:0.001, eg2Decay:0.45, eg2Sustain:0.0, eg2Release:0.35,
       lfoRate:7.2, lfoPitch:0.0, lfoFilter:0.0,
       reverbMix:0.55, delayMix:0.22, chorusMix:0.15,
-      masterVol:0.75, glide:0.0, arpRate:13,
+      masterVol:0.75, glide:0.0,
     },
     vco1Wave:'triangle', vco2Wave:'sine', lfoWave:'sine', octave:4,
-    // arp showcase: fast ping-pong across 3 octaves, latched —
-    // clean pluck, both cables intentionally unplugged
-    arp:{ on:true, mode:'updown', octaves:3, hold:true },
-    patched:{ pitch:false, filter:false },
   },
 
-  // 7 ── "TOCCATA" (baroque organ — arp plays the melody)
+  // 7 ── "ZOOLOOK" (Jean-Michel Jarre — noise texture pad)
   {
-    name: 'TOCCATA',
+    name: 'ZOOLOOK',
     params: {
-      vco1Freq:0,   vco1Fine:0,   vco1PW:0.5,  vco1Level:0.8,
-      vco2Freq:12,  vco2Fine:2,   vco2PW:0.5,  vco2Level:0.5,
-      hpfCutoff:20, lpfCutoff:10000, resonance:0.5, filterEnvAmt:0.0,
-      eg1Attack:0.005, eg1Decay:0.1, eg1Sustain:1.0, eg1Release:0.08,
-      eg2Attack:0.004, eg2Decay:0.1, eg2Sustain:1.0, eg2Release:0.09,
-      lfoRate:5.8, lfoPitch:0.03, lfoFilter:0.0,
-      reverbMix:0.5, delayMix:0.15, chorusMix:0.5,
-      masterVol:0.72, glide:0.0, arpRate:7,
+      vco1Freq:0,   vco1Fine:0,   vco1PW:0.5,  vco1Level:0.6,
+      vco2Freq:0,   vco2Fine:0,   vco2PW:0.5,  vco2Level:0.8,
+      hpfCutoff:200, lpfCutoff:2500, resonance:8, filterEnvAmt:0.4,
+      eg1Attack:0.25, eg1Decay:0.8, eg1Sustain:0.5, eg1Release:1.2,
+      eg2Attack:0.3,  eg2Decay:0.6, eg2Sustain:0.65, eg2Release:1.5,
+      lfoRate:0.9, lfoPitch:0.05, lfoFilter:0.3,
+      reverbMix:0.5, delayMix:0.2, chorusMix:0.4,
+      masterVol:0.7, glide:0.2,
     },
-    vco1Wave:'triangle', vco2Wave:'sine', lfoWave:'sine', octave:3,
-    // organ showcase: hold a chord — latched up-down figure plays
-    // a baroque line; Leslie-ish chorus + church reverb; vibrato
-    // rides the PITCH cable
-    arp:{ on:true, mode:'updown', octaves:1, hold:true },
-    patched:{ pitch:true, filter:false },
+    vco1Wave:'sawtooth', vco2Wave:'noise', lfoWave:'triangle', octave:3,
   },
 
   // 8 ── "ONE AND ONE" (Robert Miles — warm chord pad)
@@ -2855,7 +2836,7 @@ const FACTORY_PRESETS = [
       eg2Attack:0.45, eg2Decay:0.5, eg2Sustain:0.8, eg2Release:2.2,
       lfoRate:0.5, lfoPitch:0.025, lfoFilter:0.1,
       reverbMix:0.6, delayMix:0.25, chorusMix:0.45,
-      masterVol:0.72, glide:0.08, arpRate:8,
+      masterVol:0.72, glide:0.08,
     },
     vco1Wave:'sawtooth', vco2Wave:'sawtooth', lfoWave:'sine', octave:3,
   },
