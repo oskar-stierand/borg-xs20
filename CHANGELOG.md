@@ -4,6 +4,19 @@ Všechny změny jsou řazeny od nejnovějších. Formát vychází z [Keep a Cha
 
 ---
 
+## [5.6] — 2026-07-02
+
+### Změněno
+- **Factory presety — showcase arpu a kabelů (KOS-18)**:
+  - **FUGA 1497** — zvuk zachován, nově latched UP arp přes 2 oktávy (8.5 Hz) jako hypnotický bass groove, LFO dech přes FILTER kabel
+  - **EMINENT 310** (nahrazuje EQUINOXE) — lush string machine bez arpu: dva sawy rozladěné −6/+8 centů v chorusu 0.85, smyčcová obálka, jemné třpytění přes oba kabely
+  - **LASER HARP** — rychlý ping-pong arp (13 Hz, up-down) přes 3 oktávy s latch, patchbay schválně prázdný
+  - **TOCCATA** (nahrazuje ZOOLOOK) — barokní varhany: triangle + sinus o oktávu výš, Leslie chorus + chrámový reverb, up-down arp figura, vibrato přes PITCH kabel
+  - **OXYGENE IV** — kabelový showcase: wobble žije a umírá s FILTER kabelem, jemné vibrato přes PITCH kabel
+  - Všech 8 presetů má explicitní `arpRate` (deterministický RATE knob při přepínání)
+
+---
+
 ## [5.5] — 2026-07-02
 
 ### Přidáno

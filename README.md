@@ -2,7 +2,7 @@
 
 > Webový syntezátor inspirovaný legendárním Korg MS-20. Běží přímo v prohlížeči, podporuje MIDI klávesy, single-file HTML.
 
-![Version](https://img.shields.io/badge/version-5.5-orange)
+![Version](https://img.shields.io/badge/version-5.6-orange)
 ![License](https://img.shields.io/badge/license-MIT-green)
 ![Audio](https://img.shields.io/badge/Web%20Audio%20API-v2-blue)
 
@@ -17,7 +17,7 @@
 - **LFO** s modulací pitch a filtru — routing přes **patch kabely** (verlet fyzika, normalling à la MS-20)
 - **Arpeggiator** — up/down/up-down/random, 1–20 Hz, 1–3 oktávy, HOLD latch; scheduler nad Web Audio clockem
 - **MIDI podpora** — Note On/Off s velocity, Pitch Bend, CC1 (Mod Wheel), CC7 (Volume), hot-plug
-- **8 factory presetů** — CHILDREN, FUGA 1497, DREAMLAND, OXYGENE, EQUINOXE, HYPNOTIQUE, ACID SEQUENCE, PAD ATMOSPHERIQUE
+- **8 factory presetů** — CHILDREN, FUGA 1497 (arp bass), DREAMLAND, OXYGENE IV (kabelový wobble), EMINENT 310 (strings), LASER HARP (arp pluck), TOCCATA (varhany + arp), ONE AND ONE
 - **Pitch kolo** se spring-back, **Mod kolo** perzistentní
 - **Dřevěné boky z bahenního dubu** — procedurální canvas rendering (per-pixel letokruhy, medullary flecks)
 - **Computer keyboard** podpora (A–K = bílé klávesy, W/E/T/Y/U = černé)
@@ -92,6 +92,7 @@ Viz [CHANGELOG.md](./CHANGELOG.md)
 
 Tasky jsou vedeny ve složce [`tasks/`](./tasks/) — jeden soubor na task (`kos-{číslo}.md`).
 
+- [x] [KOS-18](./tasks/kos-18.md) — Factory presety předvádějící arp a kabely — *v5.6*
 - [x] [KOS-16](./tasks/kos-16.md) — Arpeggiator (mode, rate, octaves, hold) — *v5.5*
 - [x] [KOS-17](./tasks/kos-17.md) — Patch kabely MVP (LFO→filter/pitch, verlet fyzika) — *v5.4*
 - [x] [KOS-15](./tasks/kos-15.md) — ADSR: vertikální fadery — *v5.3*
