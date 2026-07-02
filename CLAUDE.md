@@ -102,7 +102,7 @@ S = {
 ## Otevřené tasky (načti z Linear před prací)
 
 ```
-(žádné — všechny tasky KOS-13/14/15 hotové; nové načti z Linear)
+KOS-16 — Arpeggiator: mode (up/down/up-down/random), rate (log 1–20 Hz), octaves (1–3), hold/latch; lookahead scheduler nad Web Audio clockem volající noteOn()/noteOff(), stav v presetech
 ```
 
 Hotové: KOS-13 (realistický vizuál kol — PR #1), KOS-14 (boky z bahenního dubu — PR #2), KOS-15 (ADSR fadery — PR #3).
