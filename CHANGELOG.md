@@ -4,6 +4,15 @@ Všechny změny jsou řazeny od nejnovějších. Formát vychází z [Keep a Cha
 
 ---
 
+## [5.3] — 2026-07-02
+
+### Změněno
+- **ADSR: vertikální fadery místo knobů (KOS-15)** — 8 obálkových parametrů (EG1 FILTER + EG2 AMP, A/D/S/R) je nyní ovládáno fadery: zapuštěný slot s bočními dílky, ivory cap ladící s klaviaturou, barevná výplň hodnoty (EG1 oranžová, EG2 jantarová); drag nahoru = zvýšit, dblclick = reset na default; capy vedle sebe vizuálně kreslí tvar obálky
+- Ostatní knoby (VCO, VCF, LFO, FX, MASTER, GLIDE) zůstávají rotační
+- Log škála časových parametrů (A/D/R) i kompatibilita presetů zachována (`applyState` nastavuje pozice faderů)
+
+---
+
 ## [5.2] — 2026-07-02
 
 ### Změněno
