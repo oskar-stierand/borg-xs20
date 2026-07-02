@@ -102,11 +102,10 @@ S = {
 ## Otevřené tasky (načti z Linear před prací)
 
 ```
-KOS-14 — Dřevěné boky: fotorealistický canvas (katedrální letokruhy, medullary flecks, varnišový lesk)
 KOS-15 — ADSR: nahradit knoby vertikálními fadery (slot + ivory cap, drag up=zvýšit, dblclick=reset)
 ```
 
-Hotové: KOS-13 (realistický vizuál kol — merged v PR #1).
+Hotové: KOS-13 (realistický vizuál kol — PR #1), KOS-14 (boky z bahenního dubu — PR #2).
 
 ---
 

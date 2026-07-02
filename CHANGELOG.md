@@ -4,6 +4,16 @@ Všechny změny jsou řazeny od nejnovějších. Formát vychází z [Keep a Cha
 
 ---
 
+## [5.2] — 2026-07-02
+
+### Změněno
+- **Dřevěné boky: bahenní dub (KOS-14)** — tmavá, odsaturovaná šedohnědá paleta místo medovo-oranžového dubu; per-pixel letokruhy (value noise / fBm) s virtuální dření mimo panel → katedrální oblouky podél desky; medullary ray flecks (stříbřité čočky napříč letokruhy); chladnější varniš i hranové odlesky
+
+### Opraveno
+- **DPR bug v `drawWoodPanel()`** — funkce četla rozměry v device pixelech, ale kontext už byl škálovaný přes `devicePixelRatio` → textura se kreslila 2× větší a ořezávala se; nyní se kreslí v CSS pixelech
+
+---
+
 ## [5.1] — 2026-07-02
 
 ### Změněno

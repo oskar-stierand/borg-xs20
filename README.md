@@ -2,7 +2,7 @@
 
 > Webový syntezátor inspirovaný legendárním Korg MS-20. Běží přímo v prohlížeči, podporuje MIDI klávesy, single-file HTML.
 
-![Version](https://img.shields.io/badge/version-5.1-orange)
+![Version](https://img.shields.io/badge/version-5.2-orange)
 ![License](https://img.shields.io/badge/license-MIT-green)
 ![Audio](https://img.shields.io/badge/Web%20Audio%20API-v2-blue)
 
@@ -18,7 +18,7 @@
 - **MIDI podpora** — Note On/Off s velocity, Pitch Bend, CC1 (Mod Wheel), CC7 (Volume), hot-plug
 - **8 factory presetů** — CHILDREN, FUGA 1497, DREAMLAND, OXYGENE, EQUINOXE, HYPNOTIQUE, ACID SEQUENCE, PAD ATMOSPHERIQUE
 - **Pitch kolo** se spring-back, **Mod kolo** perzistentní
-- **Dřevěné boky** — procedurální canvas rendering
+- **Dřevěné boky z bahenního dubu** — procedurální canvas rendering (per-pixel letokruhy, medullary flecks)
 - **Computer keyboard** podpora (A–K = bílé klávesy, W/E/T/Y/U = černé)
 
 ## 🚀 Spuštění
@@ -93,7 +93,7 @@ Tasky jsou vedeny v [Linear — BORG XS20](https://linear.app/kostohryz/project/
 
 Aktuálně otevřené:
 - [x] KOS-13 — Pitch/Mod kola: realistický vizuál (guma, ridges, 3D) — *hotovo v 5.1 (PR #1)*
-- [ ] KOS-14 — Dřevěné boky: fotorealistický canvas rendering
+- [x] KOS-14 — Dřevěné boky: fotorealistický canvas rendering — *hotovo v 5.2 (bahenní dub)*
 - [ ] KOS-15 — ADSR: nahradit knoby vertikálními fadery
 
 ## 📄 Licence
