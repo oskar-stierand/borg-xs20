@@ -2,7 +2,7 @@
 
 > Webový syntezátor inspirovaný legendárním Korg MS-20. Běží přímo v prohlížeči, podporuje MIDI klávesy, single-file HTML.
 
-![Version](https://img.shields.io/badge/version-5.6-orange)
+![Version](https://img.shields.io/badge/version-5.7-orange)
 ![License](https://img.shields.io/badge/license-MIT-green)
 ![Audio](https://img.shields.io/badge/Web%20Audio%20API-v2-blue)
 
@@ -62,8 +62,10 @@ index.html
     │   ├── VCA + saturace
     │   └── Effects bus (reverb/delay/chorus)
     ├── Voice Manager (8-hlasá polyfonie)
+    ├── Arpeggiator (vstupní vrstva mezi klávesami a hlasy)
+    ├── Patchbay (verlet kabely, normalling LFO→pitch/filter)
     ├── MIDI Handler
-    ├── UI (knobs, wheels, keyboard)
+    ├── UI (knobs, faders, wheels, keyboard)
     └── Preset system
 ```
 
@@ -92,6 +94,7 @@ Viz [CHANGELOG.md](./CHANGELOG.md)
 
 Tasky jsou vedeny ve složce [`tasks/`](./tasks/) — jeden soubor na task (`kos-{číslo}.md`).
 
+- [x] [KOS-19](./tasks/kos-19.md) — Fyzika patch kabelů (těžší kabel) + klávesy ignorují myš při tažení propojky — *v5.7*
 - [x] [KOS-18](./tasks/kos-18.md) — Factory presety předvádějící arp a kabely — *v5.6*
 - [x] [KOS-16](./tasks/kos-16.md) — Arpeggiator (mode, rate, octaves, hold) — *v5.5*
 - [x] [KOS-17](./tasks/kos-17.md) — Patch kabely MVP (LFO→filter/pitch, verlet fyzika) — *v5.4*

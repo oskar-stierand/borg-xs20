@@ -35,19 +35,26 @@ Před každou prací načti soubory se statusem `Todo` z `tasks/`.
 <style>          ← veškerý CSS
 <body>           ← HTML struktura syntetizátoru
 <script>
-  // CONSTANTS & STATE (S.params objekt)
-  // AUDIO ENGINE
-  //   buildDriftBuffer()
-  //   initAudio()
+  // WAVE SHAPE HELPERS (ikony waveform selectorů)
+  // STATE (DEFS + objekt S)
+  // ANALOG ENGINE — MS-20 CHARACTER
+  //   waveshaper curves, buildDriftBuffer()
+  //   initAudio(), buildIR()
+  //   pulseWave() / setOscWave()  (PWM)
   //   buildVoice()
-  //   noteOn() / noteOff()
+  //   noteOn() / noteOff() / allNotesOff()
   //   liveUpdate()
-  // WHEELS (createWheelCanvas)
-  // WOOD PANELS (drawWoodPanel / initWoodPanels)
   // KNOBS (initKnobs)
-  // KEYBOARD (buildKeyboard)
+  // ADSR FADERS (initFaders)
+  // PATCH CABLES (initPatchbay / updatePatchRouting)
+  // KEYBOARD (buildKeyboard, setupKey)
+  // ARPEGGIATOR (initArp, arpStep, inputNoteOn/Off)
+  // OCTAVE (changeOct)
+  // WHEELS (createWheelCanvas, initWheels)
   // MIDI (initMIDI)
-  // PRESETS (applyState / captureState)
+  // PRESETS (factory banka, applyState / captureState)
+  // HELPERS + STATUS LOOP (toast, voice counter)
+  // WOOD PANELS (drawWoodPanel / initWoodPanels)
   // BOOT (DOMContentLoaded)
 ```
 
@@ -58,13 +65,17 @@ Před každou prací načti soubory se statusem `Todo` z `tasks/`.
 | Funkce | Co dělá |
 |--------|---------|
 | `initAudio()` | Inicializace Web Audio contextu a efektů |
-| `buildVoice(freq, vel)` | Vytvoří 1 hlas (VCO→VCF→VCA) |
+| `buildVoice(ctx, midi, vel, freq, now)` | Vytvoří 1 hlas (VCO→VCF→VCA) |
 | `noteOn(midi, vel)` | Spustí hlas, voice stealing |
-| `noteOff(midi)` | Zastaví hlas, release fáze |
+| `noteOff(midi, immediate)` | Zastaví hlas, release fáze |
+| `inputNoteOn/Off(midi, vel)` | Vstupní vrstva (klávesy/MIDI) — routuje do arpu, nebo přímo na noteOn/Off |
 | `liveUpdate(param, val)` | Real-time update parametru na hrajících hlasech |
+| `initPatchbay()` | Patch kabely: verlet fyzika, drag, jacky; vystavuje `syncPatchCables()` a `isCableDrag()` |
+| `updatePatchRouting()` | Zapne/vypne LFO→pitch/filter podle `S.patched` |
+| `initArp()` / `arpStep()` | Arpeggiator UI + scheduler nad Web Audio clockem |
 | `createWheelCanvas(housing, isPitch)` | Canvas renderer pro Pitch/Mod kolo |
 | `drawWoodPanel(canvas, side)` | Canvas renderer pro dřevěné boky |
-| `initKnobs()` | Drag handling pro rotační knoby |
+| `initKnobs()` / `initFaders()` | Drag handling pro rotační knoby a ADSR fadery |
 | `buildKeyboard()` | Vykreslí klaviaturu od `S.octave` |
 | `applyState(preset)` | Načte preset do UI + audio parametrů |
 | `initMIDI()` | Web MIDI API, hot-plug, Note/Bend/CC handling |
@@ -75,26 +86,34 @@ Před každou prací načti soubory se statusem `Todo` z `tasks/`.
 
 ```javascript
 S = {
-  octave: 3,          // aktuální oktáva (0–7)
+  params: {...DEFS},  // viz níže; navíc arpRate (knob, log 1–20 Hz)
+  octave: 3,          // aktuální oktáva
+  vco1Wave, vco2Wave, lfoWave,   // waveformy (mimo params!)
+  voices: new Map(),  // aktivní hlasy midiNote → voiceObj
+  voiceList: [],      // FIFO pro voice stealing (maxVoices: 8)
   pitchBend: 0,       // ±1.0
-  voices: {},         // aktivní hlasy { midiNote: voiceObj }
-  voiceList: [],      // FIFO pro voice stealing
-  params: {
-    // VCO
-    osc1Wave, osc2Wave, osc1Tune, osc2Tune, osc1Level, osc2Level,
-    // VCF
-    filterCutoff, filterRes, eg1Amount, hpfCutoff,
-    // EG1 (filtr)
-    eg1Attack, eg1Decay, eg1Sustain, eg1Release,
-    // EG2 (amplituda)
-    eg2Attack, eg2Decay, eg2Sustain, eg2Release,
-    // LFO
-    lfoRate, lfoAmount, lfoTarget,
-    // Effects
-    reverbMix, delayTime, delayFeedback, delayMix, chorusMix,
-    // Master
-    masterVol, glide,
-  }
+  presets, activePreset,
+  patched: { pitch, filter },    // patch kabely (KOS-17)
+  arp: { on, mode, octaves, hold },  // arpeggiator (KOS-16)
+  arpHeld: [], arpLatch: [],     // fyzicky držené / latchnuté noty
+  // + audio nody (ctx, lfoNode, convolver, delayNode, masterGain, …)
+}
+
+DEFS = {
+  // VCO
+  vco1Freq, vco1Fine, vco1PW, vco1Level,
+  vco2Freq, vco2Fine, vco2PW, vco2Level,
+  // VCF
+  hpfCutoff, lpfCutoff, resonance, filterEnvAmt,
+  // EG1 (filtr) / EG2 (amplituda)
+  eg1Attack, eg1Decay, eg1Sustain, eg1Release,
+  eg2Attack, eg2Decay, eg2Sustain, eg2Release,
+  // LFO (attenuatory kabelových cest)
+  lfoRate, lfoPitch, lfoFilter,
+  // Effects (delay time/feedback jsou fixní v initAudio)
+  reverbMix, delayMix, chorusMix,
+  // Master
+  masterVol, glide,
 }
 ```
 

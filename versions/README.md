@@ -11,5 +11,6 @@ Archiv jednotlivých iterací — záloha se vytváří před každou větší z
 | `index-v5.3.html` | 5.3 | Stav před KOS-17 (patch kabely) |
 | `index-v5.4.html` | 5.4 | Stav před KOS-16 (arpeggiator) |
 | `index-v5.5.html` | 5.5 | Stav před KOS-18 (showcase presety) |
+| `index-v5.6.html` | 5.6 | Stav před KOS-19 (fyzika kabelů + guard kláves) |
 
 Aktuální produkční verze je vždy `../index.html`.
