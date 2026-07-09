@@ -19,6 +19,7 @@ Před každou prací načti soubory se statusem `Todo` z `tasks/`.
 - **Chirurgické změny** — měň jen to co je v tasku. Jeden task = jedna izolovaná změna.
 - **Syntax check** po každé změně: `node -e "new Function(js)"` na JS blok
 - **Záloha před změnou** — zkopíruj aktuální `index.html` do `versions/index-vX.html`
+- **Changelog** — před mergem PR přidej do `CHANGELOG.md` sekci `## [X.Y] — YYYY-MM-DD` (podsekce Přidáno/Změněno/Opraveno)
 - **Task update** — po dokončení tasku přepiš v `tasks/kos-XX.md` status na `Done (vX.Y, PR #N)`
 
 ### ❌ Nikdy
