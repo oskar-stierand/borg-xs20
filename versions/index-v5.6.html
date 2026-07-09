@@ -1912,7 +1912,6 @@ function initPatchbay() {
   const mouse  = { x: 0, y: 0 };
   let dragging = null;
   let paletteIdx = 0;
-  window.isCableDrag = () => !!dragging;   // keys must ignore the mouse mid-drag
 
   const makeRope = (a, b) => {
     const pts = [];
@@ -1949,11 +1948,11 @@ function initPatchbay() {
     for (const c of cables) {
       const pts = c.pts;
       for (const p of pts) {
-        const vx = (p.x - p.px) * 0.98;
-        const vy = (p.y - p.py) * 0.98;
+        const vx = (p.x - p.px) * 0.955;
+        const vy = (p.y - p.py) * 0.955;
         p.px = p.x; p.py = p.y;
         p.x += vx;
-        p.y += vy + 3200 * dt * dt;   // gravity
+        p.y += vy + 1600 * dt * dt;   // gravity
       }
       let a = null, b = null;
       if (!c.dead) {
@@ -1962,7 +1961,7 @@ function initPatchbay() {
       }
       const e0 = a || pts[0], e1 = b || pts[N - 1];
       const segLen = (Math.hypot(e1.x - e0.x, e1.y - e0.y) * 1.1 + 42) / (N - 1);
-      for (let iter = 0; iter < 4; iter++) {
+      for (let iter = 0; iter < 3; iter++) {
         if (a) { pts[0].x = a.x; pts[0].y = a.y; }
         if (b) { pts[N-1].x = b.x; pts[N-1].y = b.y; }
         for (let i = 0; i < N - 1; i++) {
@@ -2339,7 +2338,7 @@ function initArp() {
 
 function setupKey(el) {
   const getMidi = () => parseInt(el.dataset.midi);
-  const on  = e => { if (window.isCableDrag?.()) return; e.preventDefault(); const v = 0.68 + Math.random()*.18; inputNoteOn(getMidi(), v); el.classList.add('on'); };
+  const on  = e => { e.preventDefault(); const v = 0.68 + Math.random()*.18; inputNoteOn(getMidi(), v); el.classList.add('on'); };
   const off = e => { e.preventDefault(); inputNoteOff(getMidi()); el.classList.remove('on'); };
   el.addEventListener('mousedown', on);
   el.addEventListener('mouseenter', e => { if (e.buttons & 1) on(e); });
