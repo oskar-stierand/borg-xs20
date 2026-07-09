@@ -4,6 +4,16 @@ Všechny změny jsou řazeny od nejnovějších. Formát vychází z [Keep a Cha
 
 ---
 
+## [5.7] — 2026-07-09
+
+### Změněno
+- **Fyzika patch kabelů (KOS-19)** — kabel už se nevznáší jako peříčko: gravitace 1600 → 3200 px/s², tlumení 0.955 → 0.98 na substep (kabel má setrvačnost, zhoupne se a rychle usadí), constraint solver 3 → 4 iterace (lano se při silnější gravitaci neprotahuje jako guma)
+
+### Opraveno
+- **Tažení kabelu přes klaviaturu spouštělo noty** — `setupKey()` nyní přes `window.isCableDrag()` ignoruje myš, dokud je propojka držená
+
+---
+
 ## [5.6] — 2026-07-02
 
 ### Změněno
