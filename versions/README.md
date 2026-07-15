@@ -1,16 +1,17 @@
 # versions/
 
-Archiv jednotlivých iterací — záloha se vytváří před každou větší změnou (viz CLAUDE.md).
+Archive of individual iterations — a backup is created before every major change (see CLAUDE.md).
 
-| Soubor | Verze | Popis |
-|--------|-------|-------|
-| `index-v4.1-pre-v5.html` | 4.1-bugfix | Stav před v5.0 (FX routing, PWM, vizuál kláves/knobů) |
-| `index-v5.0.html` | 5.0 | Stav před KOS-13 (realistická projekce Pitch/Mod kol) |
-| `index-v5.1.html` | 5.1 | Stav před KOS-14 (boky z bahenního dubu) |
-| `index-v5.2.html` | 5.2 | Stav před KOS-15 (ADSR fadery) |
-| `index-v5.3.html` | 5.3 | Stav před KOS-17 (patch kabely) |
-| `index-v5.4.html` | 5.4 | Stav před KOS-16 (arpeggiator) |
-| `index-v5.5.html` | 5.5 | Stav před KOS-18 (showcase presety) |
-| `index-v5.6.html` | 5.6 | Stav před KOS-19 (fyzika kabelů + guard kláves) |
+| File | Version | Description |
+|------|---------|-------------|
+| `index-v4.1-pre-v5.html` | 4.1-bugfix | State before v5.0 (FX routing, PWM, key/knob visuals) |
+| `index-v5.0.html` | 5.0 | State before KOS-13 (realistic Pitch/Mod wheel projection) |
+| `index-v5.1.html` | 5.1 | State before KOS-14 (bog oak side panels) |
+| `index-v5.2.html` | 5.2 | State before KOS-15 (ADSR faders) |
+| `index-v5.3.html` | 5.3 | State before KOS-17 (patch cables) |
+| `index-v5.4.html` | 5.4 | State before KOS-16 (arpeggiator) |
+| `index-v5.5.html` | 5.5 | State before KOS-18 (showcase presets) |
+| `index-v5.6.html` | 5.6 | State before KOS-19 (cable physics + key guard) |
+| `index-v5.7.html` | 5.7 | State before KOS-29 (English translation) |
 
-Aktuální produkční verze je vždy `../index.html`.
+The current production version is always `../index.html`.

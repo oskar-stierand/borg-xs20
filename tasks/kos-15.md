@@ -1,7 +1,7 @@
-# KOS-15 — ADSR: vertikální fadery
+# KOS-15 — ADSR: vertical faders
 
 **Status:** Done (v5.3, PR #3)
 
-## Popis
+## Description
 
-8 obálkových parametrů (EG1 FILTER + EG2 AMP, A/D/S/R) ovládáno vertikálními fadery — zapuštěný slot, ivory cap, barevná výplň hodnoty; drag nahoru = zvýšit, dblclick = reset. Ostatní knoby zůstaly rotační.
+The 8 envelope parameters (EG1 FILTER + EG2 AMP, A/D/S/R) are controlled by vertical faders — recessed slot, ivory cap, colored value fill; drag up = increase, double-click = reset. All other knobs remain rotary.
