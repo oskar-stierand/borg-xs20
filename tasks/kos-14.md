@@ -1,7 +1,7 @@
-# KOS-14 — Dřevěné boky: fotorealistický canvas
+# KOS-14 — Wooden side panels: photorealistic canvas
 
 **Status:** Done (v5.2, PR #2)
 
-## Popis
+## Description
 
-Bahenní dub — tmavá odsaturovaná paleta, per-pixel letokruhy (fBm value noise) s katedrálními oblouky, medullary ray flecks, chladný varniš. Bonus: fix DPR double-scaling v `drawWoodPanel()`.
+Bog oak — dark desaturated palette, per-pixel growth rings (fBm value noise) with cathedral arches, medullary ray flecks, cool varnish. Bonus: fixed DPR double-scaling in `drawWoodPanel()`.

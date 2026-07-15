@@ -1,53 +1,53 @@
 # 🎛️ BORG XS-20
 
-> Webový syntezátor inspirovaný legendárním Korg MS-20. Běží přímo v prohlížeči, podporuje MIDI klávesy, single-file HTML.
+> A web synthesizer inspired by the legendary Korg MS-20. Runs right in the browser, supports MIDI keyboards, single-file HTML.
 
-![Version](https://img.shields.io/badge/version-5.7-orange)
+![Version](https://img.shields.io/badge/version-5.8-orange)
 ![License](https://img.shields.io/badge/license-MIT-green)
 ![Audio](https://img.shields.io/badge/Web%20Audio%20API-v2-blue)
 
 ---
 
-## ✨ Funkce
+## ✨ Features
 
-- **Analogový audio engine** — Steiner-Parker filtr, 3-stupňová saturace, termální VCO drift (pink noise ±6 centů)
-- **8-hlasá parafonie** se stealingem (FIFO) a portamentem
-- **Exponenciální ADSR** obálky (EG1 → filtr, EG2 → amplituda) — vertikální fadery s ivory capy
-- **Efekty** — reverb (IR convolution), tape delay, bucket-brigade chorus
-- **LFO** s modulací pitch a filtru — routing přes **patch kabely** (verlet fyzika, normalling à la MS-20)
-- **Arpeggiator** — up/down/up-down/random, 1–20 Hz, 1–3 oktávy, HOLD latch; scheduler nad Web Audio clockem
-- **MIDI podpora** — Note On/Off s velocity, Pitch Bend, CC1 (Mod Wheel), CC7 (Volume), hot-plug
-- **8 factory presetů** — CHILDREN, FUGA 1497 (arp bass), DREAMLAND, OXYGENE IV (kabelový wobble), EMINENT 310 (strings), LASER HARP (arp pluck), TOCCATA (varhany + arp), ONE AND ONE
-- **Pitch kolo** se spring-back, **Mod kolo** perzistentní
-- **Dřevěné boky z bahenního dubu** — procedurální canvas rendering (per-pixel letokruhy, medullary flecks)
-- **Computer keyboard** podpora (A–K = bílé klávesy, W/E/T/Y/U = černé)
+- **Analog audio engine** — Steiner-Parker filter, 3-stage saturation, thermal VCO drift (pink noise ±6 cents)
+- **8-voice polyphony** with voice stealing (FIFO) and portamento
+- **Exponential ADSR** envelopes (EG1 → filter, EG2 → amplitude) — vertical faders with ivory caps
+- **Effects** — reverb (IR convolution), tape delay, bucket-brigade chorus
+- **LFO** with pitch and filter modulation — routed via **patch cables** (verlet physics, MS-20-style normalling)
+- **Arpeggiator** — up/down/up-down/random, 1–20 Hz, 1–3 octaves, HOLD latch; scheduler on top of the Web Audio clock
+- **MIDI support** — Note On/Off with velocity, Pitch Bend, CC1 (Mod Wheel), CC7 (Volume), hot-plug
+- **8 factory presets** — CHILDREN, FUGA 1497 (arp bass), DREAMLAND, OXYGENE IV (cable wobble), EMINENT 310 (strings), LASER HARP (arp pluck), TOCCATA (organ + arp), ONE AND ONE
+- **Pitch wheel** with spring-back, persistent **Mod wheel**
+- **Bog oak wooden side panels** — procedural canvas rendering (per-pixel growth rings, medullary flecks)
+- **Computer keyboard** support (A–K = white keys, W/E/T/Y/U = black keys)
 
-## 🚀 Spuštění
+## 🚀 Getting started
 
-Stačí otevřít `index.html` v prohlížeči. Žádné závislosti, žádný build step.
+Just open `index.html` in a browser. No dependencies, no build step.
 
 ```bash
-# nebo přes lokální server (doporučeno pro MIDI):
+# or via a local server (recommended for MIDI):
 npx serve .
 # → http://localhost:3000
 ```
 
-> **MIDI poznámka:** Chrome/Edge vyžadují `https://` nebo `localhost` pro přístup k Web MIDI API. Při otevření přes `file://` Chrome zpravidla MIDI také povolí.
+> **MIDI note:** Chrome/Edge require `https://` or `localhost` for Web MIDI API access. When opened via `file://`, Chrome usually allows MIDI as well.
 
-## 🎹 Ovládání
+## 🎹 Controls
 
-| Vstup | Akce |
-|-------|------|
-| Klik na klávesu | Zahrání tónu |
-| A–K (keyboard) | Bílé klávesy |
-| W, E, T, Y, U | Černé klávesy |
-| Z / X | Oktáva dolů / nahoru |
-| MIDI klávesy | Plná podpora (Note On/Off, Bend, CC) |
-| Dvojklik na knob | Reset na default hodnotu |
+| Input | Action |
+|-------|--------|
+| Click a key | Play a note |
+| A–K (keyboard) | White keys |
+| W, E, T, Y, U | Black keys |
+| Z / X | Octave down / up |
+| MIDI keyboard | Full support (Note On/Off, Bend, CC) |
+| Double-click a knob | Reset to default value |
 
-## 🏗️ Architektura
+## 🏗️ Architecture
 
-Single-file HTML aplikace — veškerý kód (HTML, CSS, JavaScript) je v jednom souboru `index.html`. Záměrně bez frameworků ani build toolingu — maximální přenositelnost.
+Single-file HTML application — all code (HTML, CSS, JavaScript) lives in one `index.html`. Deliberately no frameworks and no build tooling — maximum portability.
 
 ```
 index.html
@@ -57,51 +57,52 @@ index.html
 │   └── Knob & wheel styling
 └── JavaScript (inline <script>)
     ├── Audio Engine
-    │   ├── VCO (2× oscilátor + drift)
+    │   ├── VCO (2× oscillator + drift)
     │   ├── VCF (Steiner-Parker simulation)
-    │   ├── VCA + saturace
+    │   ├── VCA + saturation
     │   └── Effects bus (reverb/delay/chorus)
-    ├── Voice Manager (8-hlasá polyfonie)
-    ├── Arpeggiator (vstupní vrstva mezi klávesami a hlasy)
-    ├── Patchbay (verlet kabely, normalling LFO→pitch/filter)
+    ├── Voice Manager (8-voice polyphony)
+    ├── Arpeggiator (input layer between keys and voices)
+    ├── Patchbay (verlet cables, LFO→pitch/filter normalling)
     ├── MIDI Handler
     ├── UI (knobs, faders, wheels, keyboard)
     └── Preset system
 ```
 
-## 🔊 Audio Engine — technické detaily
+## 🔊 Audio engine — technical details
 
-### Steiner-Parker filtr
-- 2× kaskádní biquad LPF s asymetrickým rozladěním (fc, fc×0.97)
-- Saturace mezi póly pro simulaci zpětnovazební distorze
-- Non-lineární Q mapping: `Q = 0.6 + (res/20)^1.6 × 17.5`
+### Steiner-Parker filter
+- 2× cascaded biquad LPF with asymmetric detuning (fc, fc×0.97)
+- Saturation between the poles to simulate feedback distortion
+- Non-linear Q mapping: `Q = 0.6 + (res/20)^1.6 × 17.5`
 
-### Saturace (3 stupně)
-1. **Pre-filter** — asymetrický tanh clip, kladná polovina tvrdší (sudé harmonické)
-2. **Resonance** — soft limiter zabraňující self-oscillation filtru
-3. **Post-filter** — Chebyshev-inspirované VCA barvení, zdůraznění 2. harmonické
+### Saturation (3 stages)
+1. **Pre-filter** — asymmetric tanh clip, positive half clips harder (even harmonics)
+2. **Resonance** — soft limiter preventing filter self-oscillation blow-up
+3. **Post-filter** — Chebyshev-inspired VCA coloring, 2nd harmonic emphasis
 
-### VCO Drift
-- 8-sekundový pink noise buffer (1/f charakter)
-- Každý hlas má ±6 centů nezávislé teplené chvění
-- Připojeno na `osc1.detune` a `osc2.detune`
+### VCO drift
+- 8-second pink noise buffer (1/f character)
+- Each voice gets ±6 cents of independent thermal wander
+- Connected to `osc1.detune` and `osc2.detune`
 
 ## 📋 Changelog
 
-Viz [CHANGELOG.md](./CHANGELOG.md)
+See [CHANGELOG.md](./CHANGELOG.md)
 
 ## 🗺️ Roadmap
 
-Tasky jsou vedeny ve složce [`tasks/`](./tasks/) — jeden soubor na task (`kos-{číslo}.md`).
+Tasks are tracked in the [`tasks/`](./tasks/) folder — one file per task (`kos-{number}.md`).
 
-- [x] [KOS-19](./tasks/kos-19.md) — Fyzika patch kabelů (těžší kabel) + klávesy ignorují myš při tažení propojky — *v5.7*
-- [x] [KOS-18](./tasks/kos-18.md) — Factory presety předvádějící arp a kabely — *v5.6*
+- [x] [KOS-29](./tasks/kos-29.md) — Translate the repository to English — *v5.8*
+- [x] [KOS-19](./tasks/kos-19.md) — Patch cable physics (heavier cable) + keys ignore the mouse while dragging a cable — *v5.7*
+- [x] [KOS-18](./tasks/kos-18.md) — Factory presets showcasing the arp and cables — *v5.6*
 - [x] [KOS-16](./tasks/kos-16.md) — Arpeggiator (mode, rate, octaves, hold) — *v5.5*
-- [x] [KOS-17](./tasks/kos-17.md) — Patch kabely MVP (LFO→filter/pitch, verlet fyzika) — *v5.4*
-- [x] [KOS-15](./tasks/kos-15.md) — ADSR: vertikální fadery — *v5.3*
-- [x] [KOS-14](./tasks/kos-14.md) — Dřevěné boky: bahenní dub — *v5.2*
-- [x] [KOS-13](./tasks/kos-13.md) — Pitch/Mod kola: realistický vizuál — *v5.1*
+- [x] [KOS-17](./tasks/kos-17.md) — Patch cables MVP (LFO→filter/pitch, verlet physics) — *v5.4*
+- [x] [KOS-15](./tasks/kos-15.md) — ADSR: vertical faders — *v5.3*
+- [x] [KOS-14](./tasks/kos-14.md) — Wooden side panels: bog oak — *v5.2*
+- [x] [KOS-13](./tasks/kos-13.md) — Pitch/Mod wheels: realistic visuals — *v5.1*
 
-## 📄 Licence
+## 📄 License
 
-MIT — volně použitelné, upravitelné, šiřitelné.
+MIT — free to use, modify, and distribute.

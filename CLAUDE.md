@@ -1,42 +1,42 @@
-# CLAUDE.md — Instrukce pro Claude Code
+# CLAUDE.md — Instructions for Claude Code
 
-Tento soubor popisuje jak pracovat s projektem BORG XS-20. Přečti ho vždy před jakoukoliv změnou kódu.
-
----
-
-## Projekt
-
-**BORG XS-20** je single-file webový syntezátor v `index.html`. Žádný build, žádné závislosti, žádný Node.js — vše je v jednom souboru.
-
-Tasky jsou vedeny ve složce **`tasks/`** — jeden soubor na task, pojmenovaný `kos-{číslo}.md` (např. `tasks/kos-16.md`). Linear zatím nepoužíváme; formát je ale Linear-importovatelný (H1 = titulek s ID, **Status:** Todo/In Progress/Done, sekce Popis) a Oskar je tam později hromadně nahraje — strukturu neměnit.  
-Před každou prací načti soubory se statusem `Todo` z `tasks/`.
+This file describes how to work on the BORG XS-20 project. Always read it before making any code change.
 
 ---
 
-## Zásady práce s kódem
+## Project
 
-### ✅ Vždy
-- **Chirurgické změny** — měň jen to co je v tasku. Jeden task = jedna izolovaná změna.
-- **Syntax check** po každé změně: `node -e "new Function(js)"` na JS blok
-- **Záloha před změnou** — zkopíruj aktuální `index.html` do `versions/index-vX.html`
-- **Changelog** — před mergem PR přidej do `CHANGELOG.md` sekci `## [X.Y] — YYYY-MM-DD` (podsekce Přidáno/Změněno/Opraveno)
-- **Task update** — po dokončení tasku přepiš v `tasks/kos-XX.md` status na `Done (vX.Y, PR #N)`
+**BORG XS-20** is a single-file web synthesizer in `index.html`. No build, no dependencies, no Node.js — everything lives in one file.
 
-### ❌ Nikdy
-- Nespouštěj více vizuálních přepisů najednou (viz zahozenou v5 — poučení z praxe)
-- Neměň audio engine a UI zároveň
-- Nepřepisuj celé funkce pokud stačí opravit 2–3 řádky
+Tasks are tracked in the **`tasks/`** folder — one file per task, named `kos-{number}.md` (e.g. `tasks/kos-16.md`). Numbering is shared with the sister project BORG XR-09 (kos-20 through kos-28 belong to XR-09). We don't use Linear yet; the format is Linear-importable (H1 = title with ID, **Status:** Todo/In Progress/Done, Description section) and Oskar will bulk-upload the tasks later — do not change the structure.
+Before starting any work, read the files with status `Todo` in `tasks/`.
 
 ---
 
-## Struktura souboru `index.html`
+## Working rules
+
+### ✅ Always
+- **Surgical changes** — only change what the task asks for. One task = one isolated change.
+- **Syntax check** after every change: `node -e "new Function(js)"` on the JS block
+- **Backup before changing** — copy the current `index.html` to `versions/index-vX.html`
+- **Changelog** — before merging a PR, add a `## [X.Y] — YYYY-MM-DD` section to `CHANGELOG.md` (Added/Changed/Fixed subsections)
+- **Task update** — after finishing a task, set the status in `tasks/kos-XX.md` to `Done (vX.Y, PR #N)`
+
+### ❌ Never
+- Don't run multiple visual rewrites at once (see the discarded v5 — a lesson learned in practice)
+- Don't change the audio engine and the UI at the same time
+- Don't rewrite whole functions when fixing 2–3 lines is enough
+
+---
+
+## Structure of `index.html`
 
 ```
-<style>          ← veškerý CSS
-<body>           ← HTML struktura syntetizátoru
+<style>          ← all CSS
+<body>           ← HTML structure of the synthesizer
 <script>
-  // WAVE SHAPE HELPERS (ikony waveform selectorů)
-  // STATE (DEFS + objekt S)
+  // WAVE SHAPE HELPERS (waveform selector icons)
+  // STATE (DEFS + the S object)
   // ANALOG ENGINE — MS-20 CHARACTER
   //   waveshaper curves, buildDriftBuffer()
   //   initAudio(), buildIR()
@@ -52,7 +52,7 @@ Před každou prací načti soubory se statusem `Todo` z `tasks/`.
   // OCTAVE (changeOct)
   // WHEELS (createWheelCanvas, initWheels)
   // MIDI (initMIDI)
-  // PRESETS (factory banka, applyState / captureState)
+  // PRESETS (factory bank, applyState / captureState)
   // HELPERS + STATUS LOOP (toast, voice counter)
   // WOOD PANELS (drawWoodPanel / initWoodPanels)
   // BOOT (DOMContentLoaded)
@@ -60,43 +60,43 @@ Před každou prací načti soubory se statusem `Todo` z `tasks/`.
 
 ---
 
-## Klíčové funkce — kde co najít
+## Key functions — where to find what
 
-| Funkce | Co dělá |
-|--------|---------|
-| `initAudio()` | Inicializace Web Audio contextu a efektů |
-| `buildVoice(ctx, midi, vel, freq, now)` | Vytvoří 1 hlas (VCO→VCF→VCA) |
-| `noteOn(midi, vel)` | Spustí hlas, voice stealing |
-| `noteOff(midi, immediate)` | Zastaví hlas, release fáze |
-| `inputNoteOn/Off(midi, vel)` | Vstupní vrstva (klávesy/MIDI) — routuje do arpu, nebo přímo na noteOn/Off |
-| `liveUpdate(param, val)` | Real-time update parametru na hrajících hlasech |
-| `initPatchbay()` | Patch kabely: verlet fyzika, drag, jacky; vystavuje `syncPatchCables()` a `isCableDrag()` |
-| `updatePatchRouting()` | Zapne/vypne LFO→pitch/filter podle `S.patched` |
-| `initArp()` / `arpStep()` | Arpeggiator UI + scheduler nad Web Audio clockem |
-| `createWheelCanvas(housing, isPitch)` | Canvas renderer pro Pitch/Mod kolo |
-| `drawWoodPanel(canvas, side)` | Canvas renderer pro dřevěné boky |
-| `initKnobs()` / `initFaders()` | Drag handling pro rotační knoby a ADSR fadery |
-| `buildKeyboard()` | Vykreslí klaviaturu od `S.octave` |
-| `applyState(preset)` | Načte preset do UI + audio parametrů |
+| Function | What it does |
+|----------|--------------|
+| `initAudio()` | Web Audio context and effects initialization |
+| `buildVoice(ctx, midi, vel, freq, now)` | Creates 1 voice (VCO→VCF→VCA) |
+| `noteOn(midi, vel)` | Starts a voice, voice stealing |
+| `noteOff(midi, immediate)` | Stops a voice, release phase |
+| `inputNoteOn/Off(midi, vel)` | Input layer (keys/MIDI) — routes into the arp, or directly to noteOn/Off |
+| `liveUpdate(param, val)` | Real-time parameter update on playing voices |
+| `initPatchbay()` | Patch cables: verlet physics, dragging, jacks; exposes `syncPatchCables()` and `isCableDrag()` |
+| `updatePatchRouting()` | Enables/disables LFO→pitch/filter based on `S.patched` |
+| `initArp()` / `arpStep()` | Arpeggiator UI + scheduler on top of the Web Audio clock |
+| `createWheelCanvas(housing, isPitch)` | Canvas renderer for the Pitch/Mod wheel |
+| `drawWoodPanel(canvas, side)` | Canvas renderer for the wooden side panels |
+| `initKnobs()` / `initFaders()` | Drag handling for rotary knobs and ADSR faders |
+| `buildKeyboard()` | Renders the keyboard starting at `S.octave` |
+| `applyState(preset)` | Loads a preset into the UI + audio parameters |
 | `initMIDI()` | Web MIDI API, hot-plug, Note/Bend/CC handling |
 
 ---
 
-## State objekt `S`
+## The `S` state object
 
 ```javascript
 S = {
-  params: {...DEFS},  // viz níže; navíc arpRate (knob, log 1–20 Hz)
-  octave: 3,          // aktuální oktáva
-  vco1Wave, vco2Wave, lfoWave,   // waveformy (mimo params!)
-  voices: new Map(),  // aktivní hlasy midiNote → voiceObj
-  voiceList: [],      // FIFO pro voice stealing (maxVoices: 8)
+  params: {...DEFS},  // see below; plus arpRate (knob, log 1–20 Hz)
+  octave: 3,          // current octave
+  vco1Wave, vco2Wave, lfoWave,   // waveforms (outside params!)
+  voices: new Map(),  // active voices midiNote → voiceObj
+  voiceList: [],      // FIFO for voice stealing (maxVoices: 8)
   pitchBend: 0,       // ±1.0
   presets, activePreset,
-  patched: { pitch, filter },    // patch kabely (KOS-17)
+  patched: { pitch, filter },    // patch cables (KOS-17)
   arp: { on, mode, octaves, hold },  // arpeggiator (KOS-16)
-  arpHeld: [], arpLatch: [],     // fyzicky držené / latchnuté noty
-  // + audio nody (ctx, lfoNode, convolver, delayNode, masterGain, …)
+  arpHeld: [], arpLatch: [],     // physically held / latched notes
+  // + audio nodes (ctx, lfoNode, convolver, delayNode, masterGain, …)
 }
 
 DEFS = {
@@ -105,12 +105,12 @@ DEFS = {
   vco2Freq, vco2Fine, vco2PW, vco2Level,
   // VCF
   hpfCutoff, lpfCutoff, resonance, filterEnvAmt,
-  // EG1 (filtr) / EG2 (amplituda)
+  // EG1 (filter) / EG2 (amplitude)
   eg1Attack, eg1Decay, eg1Sustain, eg1Release,
   eg2Attack, eg2Decay, eg2Sustain, eg2Release,
-  // LFO (attenuatory kabelových cest)
+  // LFO (attenuators of the cable paths)
   lfoRate, lfoPitch, lfoFilter,
-  // Effects (delay time/feedback jsou fixní v initAudio)
+  // Effects (delay time/feedback are fixed in initAudio)
   reverbMix, delayMix, chorusMix,
   // Master
   masterVol, glide,
@@ -119,42 +119,42 @@ DEFS = {
 
 ---
 
-## Otevřené tasky
+## Open tasks
 
-Jediný zdroj pravdy je složka **`tasks/`** (`kos-{číslo}.md`, jeden soubor na task) — `Status: Todo` = otevřené, `Status: Done` = hotová historie. Tady v CLAUDE.md se tasky nevedou.
+The single source of truth is the **`tasks/`** folder (`kos-{number}.md`, one file per task) — `Status: Todo` = open, `Status: Done` = finished history. Tasks are not tracked here in CLAUDE.md.
 
 ---
 
 ## Git workflow
 
 ```bash
-# Před každým taskem
-git checkout -b kos-XX-kratky-popis
+# Before each task
+git checkout -b kos-XX-short-slug
 
-# Po dokončení
+# After finishing
 git add index.html
-git commit -m "KOS-XX: stručný popis co bylo změněno"
-git push origin kos-XX-kratky-popis
-# → otevřít Pull Request na GitHubu (gh pr create)
+git commit -m "KOS-XX: brief description of what changed"
+git push origin kos-XX-short-slug
+# → open a Pull Request on GitHub (gh pr create)
 ```
 
-Branch naming: `kos-{číslo}-{slug}` (stejný formát jako Linear `gitBranchName`).
+Branch naming: `kos-{number}-{slug}` (same format as Linear `gitBranchName`).
 
 ---
 
-## Testování
+## Testing
 
-Žádné automatické testy. Manuální checklist po každé změně:
+No automated tests. Manual checklist after every change:
 
-- [ ] JS syntax check projde bez chyb
-- [ ] Syntetizátor se načte v Chrome bez console errors
-- [ ] MIDI klávesy fungují (Note On/Off, vizuální highlight)
-- [ ] Presety se správně načítají (applyState)
-- [ ] Změna oktávy překreslí klaviaturu
-- [ ] Zvuk hraje bez artefaktů
+- [ ] JS syntax check passes without errors
+- [ ] The synthesizer loads in Chrome without console errors
+- [ ] MIDI keys work (Note On/Off, visual highlight)
+- [ ] Presets load correctly (applyState)
+- [ ] Changing the octave redraws the keyboard
+- [ ] Sound plays without artifacts
 
 ---
 
-## Komunikace
+## Language policy
 
-Projekt je vyvíjen česky. Commit messages jsou anglicky (konvence).
+Development communication with Oskar is in **Czech**. Everything in the public repo is in **English**: README, CHANGELOG, CLAUDE.md, task files in `tasks/`, code comments, and commit messages.

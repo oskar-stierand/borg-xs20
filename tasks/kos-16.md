@@ -2,18 +2,18 @@
 
 **Status:** Done (v5.5, PR #5)
 
-## Popis
+## Description
 
-Arpeggiator nad klaviaturou — z držených kláves generuje rytmickou sekvenci.
+Arpeggiator on top of the keyboard — generates a rhythmic sequence from held keys.
 
-Ovládání:
+Controls:
 - MODE: up / down / up-down / random
-- RATE: rychlost kroků (Hz, log škála, cca 1–20 Hz)
+- RATE: step speed (Hz, log scale, roughly 1–20 Hz)
 - OCTAVES: 1–3
-- HOLD: latch — sekvence běží i po puštění kláves
+- HOLD: latch — the sequence keeps running after the keys are released
 
-Technicky:
-- Časovač nad Web Audio clockem (lookahead scheduler, ne setInterval)
-- Volá existující `noteOn()`/`noteOff()` podle držených kláves — audio engine beze změny
-- UI: nová malá sekce v panelu (styl konzistentní s LFO sekcí)
-- Uložit stav arpu do presetů (`captureState`/`applyState`)
+Technical notes:
+- Timer built on the Web Audio clock (lookahead scheduler, not setInterval)
+- Calls the existing `noteOn()`/`noteOff()` based on held keys — audio engine unchanged
+- UI: a new small panel section (style consistent with the LFO section)
+- Arp state is stored in presets (`captureState`/`applyState`)

@@ -1,18 +1,18 @@
-# KOS-18 — Factory presety předvádějící arp a patch kabely
+# KOS-18 — Factory presets showcasing the arp and patch cables
 
 **Status:** Done (v5.6, PR #6)
 
-## Popis
+## Description
 
-Aktualizace factory presetů tak, aby funkce z v5.4/v5.5 byly slyšet hned po načtení. Bez změn enginu — jen data presetů.
+Update the factory presets so the v5.4/v5.5 features are audible right after loading. No engine changes — preset data only.
 
-- **FUGA 1497** — zvuk zachován (líbil se), přidán latched UP arp přes 2 oktávy (8.5 Hz) jako hypnotický bass groove; LFO dech přes FILTER kabel
-- **EMINENT 310** — nahrazuje EQUINOXE (zněl nakřáple i po úpravě, zahozen); lush string machine **bez arpu**: dva sawy −6/+8 centů, chorus 0.85, smyčcová obálka, HPF 140
-- **LASER HARP** — rychlý ping-pong arp (13 Hz, up-down) přes 3 oktávy s latch; čistý pluck, patchbay schválně prázdný
-- **TOCCATA** — nahrazuje ZOOLOOK (nuda); barokní varhany: triangle + sinus +12, okamžitý attack / plný sustain, Leslie chorus + chrámový reverb, up-down arp figura (7 Hz, latch), vibrato přes PITCH kabel
-- **OXYGENE IV** — kabelový showcase: wobble žije a umírá s FILTER kabelem, PITCH kabel nese jemné vibrato
-- Všech 8 presetů má explicitní `arpRate` v params
+- **FUGA 1497** — sound preserved (it was liked), added a latched UP arp across 2 octaves (8.5 Hz) as a hypnotic bass groove; LFO breathing via the FILTER cable
+- **EMINENT 310** — replaces EQUINOXE (sounded raspy even after tweaking, dropped); lush string machine **without arp**: two saws −6/+8 cents, chorus 0.85, string envelope, HPF 140
+- **LASER HARP** — fast ping-pong arp (13 Hz, up-down) across 3 octaves with latch; clean pluck, patchbay intentionally empty
+- **TOCCATA** — replaces ZOOLOOK (boring); baroque organ: triangle + sine +12, instant attack / full sustain, Leslie chorus + church reverb, up-down arp figure (7 Hz, latch), vibrato via the PITCH cable
+- **OXYGENE IV** — cable showcase: the wobble lives and dies with the FILTER cable, the PITCH cable carries subtle vibrato
+- All 8 presets have an explicit `arpRate` in params
 
-## Poznámky z iterace
+## Iteration notes
 
-- Preset 5 prošel dvěma koly: EQUINOXE (arp showcase) → uhlazený EQUINOXE → zahozen úplně ve prospěch EMINENT 310 dle Oskara („nechme nějaký hezký zvuk bez arpu")
+- Preset 5 went through two rounds: EQUINOXE (arp showcase) → smoothed EQUINOXE → dropped entirely in favor of EMINENT 310 per Oskar ("let's keep one nice sound without the arp")
