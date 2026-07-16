@@ -1,5 +1,7 @@
 # 🎛️ BORG XS-20
 
+![BORG XS-20 — OXYGENE IV patch with both LFO cables plugged](docs/screenshots/borg-xs20.png)
+
 > A web synthesizer inspired by the legendary Korg MS-20. Runs right in the browser, supports MIDI keyboards, single-file HTML.
 
 ![Version](https://img.shields.io/badge/version-5.8-orange)

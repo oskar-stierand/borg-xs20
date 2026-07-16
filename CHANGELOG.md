@@ -4,6 +4,13 @@ All changes are listed newest first. The format follows [Keep a Changelog](https
 
 ---
 
+## [docs] — 2026-07-16
+
+### Added
+- **README hero screenshot (KOS-31)** — a single preview image under the title: the OXYGENE IV preset with both LFO cables plugged. No app changes (`index.html` untouched); image captured reproducibly via headless Chrome + the `?patch=` URL.
+
+---
+
 ## [5.8] — 2026-07-15
 
 ### Changed
